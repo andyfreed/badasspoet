@@ -23,11 +23,12 @@ jobs:
         env:
           PUBLIC_URL: https://badasspoet.com
 
-      - name: Deploy to Dreamhost via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      - name: Deploy to Dreamhost via SFTP
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
           server: pdx1-shared-a1-25.dreamhost.com
           username: dh_2bzpfx
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./build/
-          server-dir: /home/dh_2bzpfx/badasspoet.com/ 
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          local_path: ./build/*
+          remote_path: /home/dh_2bzpfx/badasspoet.com/
+          sftpArgs: '-o StrictHostKeyChecking=no' 
