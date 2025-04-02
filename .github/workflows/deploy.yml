@@ -23,12 +23,11 @@ jobs:
         env:
           PUBLIC_URL: https://badasspoet.com
 
-      - name: Deploy to Dreamhost
-        uses: easingthemes/ssh-deploy@main
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          REMOTE_HOST: ${{ secrets.DREAMHOST_SERVER }}
-          REMOTE_USER: ${{ secrets.DREAMHOST_USER }}
-          SOURCE: "build/"
-          TARGET: ${{ secrets.REMOTE_TARGET }}
-          ARGS: "-rltgoDzvO --delete" 
+      - name: Deploy to Dreamhost via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: pdx1-shared-a1-25.dreamhost.com
+          username: dh_2bzpfx
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./build/
+          server-dir: /home/dh_2bzpfx/badasspoet.com/ 
