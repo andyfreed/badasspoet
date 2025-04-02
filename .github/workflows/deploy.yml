@@ -23,22 +23,12 @@ jobs:
         env:
           PUBLIC_URL: https://badasspoet.com
 
-      - name: Debug SSH Key
-        run: |
-          echo "Setting up SSH key..."
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keygen -y -f ~/.ssh/deploy_key || echo "Invalid key format"
-          echo "Testing SSH connection..."
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no dh_2bzpfx@pdx1-shared-a1-25.dreamhost.com 'echo "SSH connection successful"' || echo "SSH connection failed"
-
       - name: Deploy to Dreamhost via SFTP
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        uses: pressidium/lftp-mirror-action@v1
         with:
-          server: pdx1-shared-a1-25.dreamhost.com
-          username: dh_2bzpfx
-          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          local_path: ./build/*
-          remote_path: /home/dh_2bzpfx/badasspoet.com/
-          sftpArgs: '-o StrictHostKeyChecking=no' 
+          host: pdx1-shared-a1-25.dreamhost.com
+          user: dh_2bzpfx
+          pass: ${{ secrets.FTP_PASSWORD }}
+          localDir: ./build
+          remoteDir: /home/dh_2bzpfx/badasspoet.com
+          options: --verbose 
