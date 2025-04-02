@@ -20,6 +20,8 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          PUBLIC_URL: https://badasspoet.com
 
       - name: Deploy to Dreamhost
         uses: easingthemes/ssh-deploy@main
@@ -28,4 +30,5 @@ jobs:
           REMOTE_HOST: ${{ secrets.DREAMHOST_SERVER }}
           REMOTE_USER: ${{ secrets.DREAMHOST_USER }}
           SOURCE: "build/"
-          TARGET: ${{ secrets.REMOTE_TARGET }} 
+          TARGET: ${{ secrets.REMOTE_TARGET }}
+          ARGS: "-rltgoDzvO --delete" 
