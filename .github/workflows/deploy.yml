@@ -22,6 +22,7 @@ jobs:
         run: npm run build
         env:
           PUBLIC_URL: https://badasspoet.com
+          NODE_OPTIONS: --openssl-legacy-provider
 
       - name: Deploy to Dreamhost via SFTP
         uses: pressidium/lftp-mirror-action@v1
@@ -31,4 +32,4 @@ jobs:
           pass: ${{ secrets.FTP_PASSWORD }}
           localDir: ./build
           remoteDir: /home/dh_2bzpfx/badasspoet.com
-          options: --verbose 
+          options: --verbose
