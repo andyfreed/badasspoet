@@ -4,6 +4,25 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+// Flicker effect logic
+function triggerFlicker() {
+  document.body.classList.add('flicker-effect');
+  setTimeout(() => {
+    document.body.classList.remove('flicker-effect');
+  }, 350);
+}
+
+function scheduleFlicker() {
+  const min = 4000; // 4 seconds
+  const max = 12000; // 12 seconds
+  setTimeout(() => {
+    triggerFlicker();
+    scheduleFlicker();
+  }, Math.random() * (max - min) + min);
+}
+
+scheduleFlicker();
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
