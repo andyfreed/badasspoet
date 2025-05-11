@@ -38,7 +38,7 @@ type ContextMenuItemType = {
 const GlobalStyles = createGlobalStyle`
   body {
     font-family: 'ms_sans_serif', sans-serif;
-    background: teal;
+    background: url('/background.png') center center / cover no-repeat !important;
     min-height: 100vh;
     margin: 0;
     padding: 0;
