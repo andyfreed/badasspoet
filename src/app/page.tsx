@@ -4,9 +4,9 @@ import {
   AppBar, 
   Toolbar, 
   Button, 
-  MenuList, 
-  MenuListItem, 
-  Separator,
+  List,
+  ListItem,
+  Divider,
   Window,
   WindowHeader,
   WindowContent,
@@ -118,7 +118,7 @@ const StartMenuContent = styled.div`
 `;
 
 // Create a styled MenuList with custom background
-const StyledMenuList = styled(MenuList)`
+const StyledMenuList = styled(List)`
   background: #c0c0c0;
   border: none;
   box-shadow: none;
@@ -325,7 +325,7 @@ export default function Home() {
           >
             <StyledMenuList>
               {contextMenuItems.map((item) => (
-                <MenuListItem 
+                <ListItem 
                   key={item.action}
                   onClick={() => {
                     if (item.action === 'open' && contextMenu.item) {
@@ -335,7 +335,7 @@ export default function Home() {
                   }}
                 >
                   {item.name}
-                </MenuListItem>
+                </ListItem>
               ))}
             </StyledMenuList>
           </ContextMenu>
@@ -385,29 +385,29 @@ export default function Home() {
             <StartMenuContent>
               <StyledMenuList>
                 {menuItems.map((item) => (
-                  <MenuListItem key={item.name}>
+                  <ListItem key={item.name}>
                     <span style={{ marginRight: 8 }}>{item.icon}</span>
                     {item.name}
-                  </MenuListItem>
+                  </ListItem>
                 ))}
-                <Separator />
-                <MenuListItem>
+                <Divider />
+                <ListItem>
                   <span style={{ marginRight: 8 }}>⚙️</span>
                   Settings
-                </MenuListItem>
-                <MenuListItem>
+                </ListItem>
+                <ListItem>
                   <span style={{ marginRight: 8 }}>🔍</span>
                   Find
-                </MenuListItem>
-                <MenuListItem>
+                </ListItem>
+                <ListItem>
                   <span style={{ marginRight: 8 }}>❓</span>
                   Help
-                </MenuListItem>
-                <Separator />
-                <MenuListItem>
+                </ListItem>
+                <Divider />
+                <ListItem>
                   <span style={{ marginRight: 8 }}>🚪</span>
                   Shut Down...
-                </MenuListItem>
+                </ListItem>
               </StyledMenuList>
             </StartMenuContent>
           </StartMenu>

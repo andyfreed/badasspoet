@@ -13,7 +13,7 @@
     "platinum": "github:robbiebyrd/classicy",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react95": "^4.0.0",
+    "react95": "^3.11.0",
     "styled-components": "^6.1.18"
   },
   "devDependencies": {
