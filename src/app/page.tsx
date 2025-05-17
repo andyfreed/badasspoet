@@ -14,7 +14,6 @@ import {
 } from 'react95';
 import styled, { ThemeProvider, createGlobalStyle } from 'styled-components';
 import original from 'react95/dist/themes/original';
-import { StyleFix } from './StyleFix';
 
 // Type definitions
 type DesktopItemType = 'computer' | 'recyclebin' | 'gayporn' | 'workfiles' | 'legalissues';
