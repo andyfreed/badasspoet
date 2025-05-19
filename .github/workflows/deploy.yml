@@ -29,5 +29,5 @@ jobs:
           host: pdx1-shared-a1-25.dreamhost.com
           user: dh_2bzpfx
           pass: ${{ secrets.FTP_PASSWORD }}
-          localDir: ./out
+          localDir: ./.next/export
           remoteDir: /home/dh_2bzpfx/badasspoet.com
