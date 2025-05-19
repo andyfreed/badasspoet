@@ -2,6 +2,7 @@
 const nextConfig = {
   output: 'export',  // Enable static HTML export
   distDir: 'out',    // Custom build directory for the static export
+  trailingSlash: true, // Add trailing slash to ensure index.html files are generated
   images: {
     unoptimized: true, // Needed for static export
   },
