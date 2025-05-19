@@ -25,10 +25,12 @@ jobs:
 
       - name: List output directories
         run: |
-          echo "Contents of .next:"
-          ls -la .next
-          echo "Contents of out (if exists):"
+          echo "Contents of output directories:"
+          ls -la
+          echo "Contents of out directory (if exists):"
           ls -la out || echo "out directory does not exist"
+          echo "Contents of .next directory (if exists):"
+          ls -la .next || echo ".next directory does not exist"
 
       - name: Deploy to Dreamhost via SFTP
         uses: pressidium/lftp-mirror-action@v1
@@ -36,5 +38,5 @@ jobs:
           host: pdx1-shared-a1-25.dreamhost.com
           user: dh_2bzpfx
           pass: ${{ secrets.FTP_PASSWORD }}
-          localDir: ./.next
+          localDir: ./out
           remoteDir: /home/dh_2bzpfx/badasspoet.com
