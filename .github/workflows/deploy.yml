@@ -23,11 +23,18 @@ jobs:
         env:
           PUBLIC_URL: https://badasspoet.com
 
+      - name: List output directories
+        run: |
+          echo "Contents of .next:"
+          ls -la .next
+          echo "Contents of out (if exists):"
+          ls -la out || echo "out directory does not exist"
+
       - name: Deploy to Dreamhost via SFTP
         uses: pressidium/lftp-mirror-action@v1
         with:
           host: pdx1-shared-a1-25.dreamhost.com
           user: dh_2bzpfx
           pass: ${{ secrets.FTP_PASSWORD }}
-          localDir: ./.next/export
+          localDir: ./.next
           remoteDir: /home/dh_2bzpfx/badasspoet.com
