@@ -6,7 +6,9 @@ import { env } from '../lib/env';
 
 interface ExampleItem {
   id: number;
-  name: string;
+  title: string;
+  content: string;
+  is_published: boolean;
   created_at: string;
 }
 
@@ -23,7 +25,7 @@ export default function SupabaseExample() {
           throw new Error('Supabase environment variables are not configured');
         }
 
-        // Replace 'examples' with your actual table name
+        // Fetch data from the examples table
         const { data, error } = await supabase
           .from('examples')
           .select('*');
@@ -97,7 +99,9 @@ export default function SupabaseExample() {
           <h3>Data from Supabase:</h3>
           <ul>
             {data.map((item) => (
-              <li key={item.id}>{item.name}</li>
+              <li key={item.id}>
+                <strong>{item.title}</strong> {item.is_published ? '' : '(Draft)'} - <span>{item.content}</span>
+              </li>
             ))}
           </ul>
         </div>
