@@ -14,6 +14,11 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Add environment variables that need to be exposed to the client
+  env: {
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  },
 };
 
 module.exports = nextConfig; 
