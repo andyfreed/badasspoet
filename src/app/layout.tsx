@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Badasspoet 95",
-  description: "Welcome to Badasspoet 95 - Windows 95-style experience",
+  title: "Badasspoet",
+  description: "Welcome to Badasspoet",
 };
 
 export default function RootLayout({
@@ -14,14 +14,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link
-          rel="stylesheet"
-          href="https://unpkg.com/react95@4.0.0/dist/fonts/ms_sans_serif.css"
-        />
-        <link
-          rel="stylesheet"
-          href="https://unpkg.com/react95@4.0.0/dist/fonts/ms_sans_serif_bold.css"
-        />
       </head>
       <body>
         {children}
