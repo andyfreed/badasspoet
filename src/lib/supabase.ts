@@ -2,24 +2,42 @@ import { createClient } from '@supabase/supabase-js';
 import { env } from './env';
 
 // Create a single supabase client for the entire app
-// Adding try/catch to prevent runtime errors
+// with proper typing to fix TypeScript errors
 let supabaseClient;
+
 try {
   if (!env.isSupabaseConfigured()) {
     console.warn('Supabase environment variables are not properly configured.');
-    // Create a dummy client in development to prevent runtime errors
+    // In development, create a dummy client that won't throw runtime errors
     if (process.env.NODE_ENV === 'development') {
-      supabaseClient = {
+      // Create a mock client for development with required methods
+      const mockSupabase = {
         from: () => ({
           select: () => Promise.resolve({ 
             data: [], 
             error: { message: 'Supabase not configured - check .env.local file' } 
+          }),
+          order: () => ({
+            select: () => Promise.resolve({ 
+              data: [], 
+              error: { message: 'Supabase not configured - check .env.local file' } 
+            })
           })
-        })
+        }),
+        auth: {
+          getSession: () => Promise.resolve({ data: { session: null } }),
+          onAuthStateChange: () => ({ 
+            data: { subscription: { unsubscribe: () => {} } } 
+          }),
+          signUp: () => Promise.resolve({ data: { user: null }, error: null }),
+          signInWithPassword: () => Promise.resolve({ data: { user: null }, error: null }),
+          signOut: () => Promise.resolve({ error: null })
+        },
+        rpc: () => Promise.resolve({ data: null, error: null })
       };
+      supabaseClient = mockSupabase;
     } else {
       // In production, try to create a client with empty strings
-      // This will likely fail but allows the site to load
       supabaseClient = createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
     }
   } else {
@@ -29,11 +47,21 @@ try {
   }
 } catch (error) {
   console.error('Error initializing Supabase client:', error);
-  // Create a placeholder client that won't throw runtime errors
+  // Create a placeholder client with auth methods
   supabaseClient = {
     from: () => ({
       select: () => Promise.resolve({ data: [], error: { message: 'Supabase initialization error' } })
-    })
+    }),
+    auth: {
+      getSession: () => Promise.resolve({ data: { session: null } }),
+      onAuthStateChange: () => ({ 
+        data: { subscription: { unsubscribe: () => {} } } 
+      }),
+      signUp: () => Promise.resolve({ data: { user: null }, error: null }),
+      signInWithPassword: () => Promise.resolve({ data: { user: null }, error: null }),
+      signOut: () => Promise.resolve({ error: null })
+    },
+    rpc: () => Promise.resolve({ data: null, error: null })
   };
 }
 
