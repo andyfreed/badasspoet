@@ -1,68 +1,25 @@
 import { createClient } from '@supabase/supabase-js';
-import { env } from './env';
 
-// Create a single supabase client for the entire app
-// with proper typing to fix TypeScript errors
-let supabaseClient;
+// Get environment variables
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-try {
-  if (!env.isSupabaseConfigured()) {
-    console.warn('Supabase environment variables are not properly configured.');
-    // In development, create a dummy client that won't throw runtime errors
-    if (process.env.NODE_ENV === 'development') {
-      // Create a mock client for development with required methods
-      const mockSupabase = {
-        from: () => ({
-          select: () => Promise.resolve({ 
-            data: [], 
-            error: { message: 'Supabase not configured - check .env.local file' } 
-          }),
-          order: () => ({
-            select: () => Promise.resolve({ 
-              data: [], 
-              error: { message: 'Supabase not configured - check .env.local file' } 
-            })
-          })
-        }),
-        auth: {
-          getSession: () => Promise.resolve({ data: { session: null } }),
-          onAuthStateChange: () => ({ 
-            data: { subscription: { unsubscribe: () => {} } } 
-          }),
-          signUp: () => Promise.resolve({ data: { user: null }, error: null }),
-          signInWithPassword: () => Promise.resolve({ data: { user: null }, error: null }),
-          signOut: () => Promise.resolve({ error: null })
-        },
-        rpc: () => Promise.resolve({ data: null, error: null })
-      };
-      supabaseClient = mockSupabase;
-    } else {
-      // In production, try to create a client with empty strings
-      supabaseClient = createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
-    }
-  } else {
-    // Normal initialization with valid environment variables
-    supabaseClient = createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
-    console.log('Supabase client initialized successfully');
-  }
-} catch (error) {
-  console.error('Error initializing Supabase client:', error);
-  // Create a placeholder client with auth methods
-  supabaseClient = {
-    from: () => ({
-      select: () => Promise.resolve({ data: [], error: { message: 'Supabase initialization error' } })
-    }),
-    auth: {
-      getSession: () => Promise.resolve({ data: { session: null } }),
-      onAuthStateChange: () => ({ 
-        data: { subscription: { unsubscribe: () => {} } } 
-      }),
-      signUp: () => Promise.resolve({ data: { user: null }, error: null }),
-      signInWithPassword: () => Promise.resolve({ data: { user: null }, error: null }),
-      signOut: () => Promise.resolve({ error: null })
-    },
-    rpc: () => Promise.resolve({ data: null, error: null })
-  };
+// Check if environment variables are available
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Missing Supabase environment variables:', {
+    url: supabaseUrl ? 'Set' : 'Not set',
+    key: supabaseAnonKey ? 'Set' : 'Not set'
+  });
+  throw new Error('Missing Supabase environment variables');
 }
 
-export const supabase = supabaseClient; 
+// Create Supabase client
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+});
+
+console.log('Supabase client initialized with URL:', supabaseUrl); 

@@ -8,13 +8,16 @@ type AuthContextType = {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  isAdmin: boolean;
   signUp: (email: string, password: string, username: string) => Promise<{ error: any; data: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any; data: any }>;
   signOut: () => Promise<void>;
-  availableUsernames: { id: number; username: string; is_taken: boolean }[];
+  availableUsernames: { id: number; username: string; is_taken: boolean; user_id?: string | null; is_admin?: boolean }[];
   fetchUsernames: () => Promise<void>;
   selectedUsername: string | null;
   setSelectedUsername: (username: string | null) => void;
+  makeUserAdmin: (targetUserId: string) => Promise<boolean>;
+  removeUserAdmin: (targetUserId: string) => Promise<boolean>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,10 +26,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [availableUsernames, setAvailableUsernames] = useState<
-    { id: number; username: string; is_taken: boolean }[]
+    { id: number; username: string; is_taken: boolean; user_id?: string | null; is_admin?: boolean }[]
   >([]);
   const [selectedUsername, setSelectedUsername] = useState<string | null>(null);
+
+  // Check if current user is admin
+  const checkAdminStatus = async (userId: string) => {
+    try {
+      console.log('Checking admin status for user:', userId);
+      const { data, error } = await supabase.rpc('is_user_admin', { user_uuid: userId });
+      console.log('Admin check result:', data, 'Error:', error);
+      if (!error && data !== null && data !== undefined) {
+        setIsAdmin(data);
+      } else {
+        console.error('Admin check failed:', error);
+        setIsAdmin(false);
+      }
+    } catch (err) {
+      console.error('Error checking admin status:', err);
+      setIsAdmin(false);
+    }
+  };
 
   useEffect(() => {
     // Setup auth state listener
@@ -34,12 +56,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data } = await supabase.auth.getSession();
       setSession(data.session);
       setUser(data.session?.user || null);
+      
+      // Check admin status if user exists
+      if (data.session?.user) {
+        await checkAdminStatus(data.session.user.id);
+      }
 
       const { data: authListener } = supabase.auth.onAuthStateChange(
         async (event, session) => {
           console.log(`Auth event: ${event}`);
           setSession(session);
           setUser(session?.user || null);
+          
+          // Check admin status on auth state change
+          if (session?.user) {
+            await checkAdminStatus(session.user.id);
+          } else {
+            setIsAdmin(false);
+          }
         }
       );
 
@@ -59,17 +93,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Fetch available usernames
   const fetchUsernames = async () => {
     try {
+      console.log('Fetching usernames...');
       const { data, error } = await supabase
         .from('usernames')
-        .select('*')
-        .order('username');
+        .select('*');
 
       if (error) {
         console.error('Error fetching usernames:', error);
         return;
       }
 
-      setAvailableUsernames(data || []);
+      console.log('Fetched usernames:', data);
+      // Sort the data manually if needed
+      const sortedData = data ? [...data].sort((a, b) => a.username.localeCompare(b.username)) : [];
+      setAvailableUsernames(sortedData);
     } catch (err) {
       console.error('Error in fetchUsernames:', err);
     }
@@ -83,7 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email,
         password,
         options: {
-          emailRedirectTo: '',
+          emailRedirectTo: window.location.origin,
           data: {
             username: username // Store username in user metadata
           }
@@ -95,22 +132,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       if (data.user) {
+        // If email confirmation is required, we need to handle it differently
+        if (data.user.identities && data.user.identities.length === 0) {
+          // User needs to confirm email
+          return { 
+            error: new Error('Please check your email to confirm your account. After confirming, you can sign in.'), 
+            data: null 
+          };
+        }
+
+        // Small delay to ensure user is properly created in the database
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
         // Then claim the username
         const { data: claimData, error: claimError } = await supabase.rpc(
           'claim_username',
           { username_to_claim: username, user_uuid: data.user.id }
         );
 
-        if (claimError || !claimData) {
+        if (claimError) {
           console.error('Error claiming username:', claimError);
-          // If username claim fails, we should ideally delete the user account
-          // but Supabase doesn't easily allow this, so we'll just return the error
-          return { error: claimError || new Error('Failed to claim username'), data: null };
+          // Try to sign the user in anyway if username claim fails
+          if (data.session) {
+            setSession(data.session);
+            setUser(data.user);
+            await fetchUsernames();
+            return { 
+              error: new Error('Account created but username claim failed. You can still sign in.'), 
+              data 
+            };
+          }
+          return { error: claimError, data: null };
         }
 
-        // Auto sign-in after successful registration by directly setting the session and user
-        setSession(data.session);
-        setUser(data.user);
+        // Auto sign-in after successful registration
+        if (data.session) {
+          setSession(data.session);
+          setUser(data.user);
+        }
 
         // Refresh the usernames list
         await fetchUsernames();
@@ -147,12 +206,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Make user admin
+  const makeUserAdmin = async (targetUserId: string) => {
+    try {
+      if (!user) return false;
+      const { data, error } = await supabase.rpc('make_user_admin', { 
+        target_user_id: targetUserId,
+        requesting_user_id: user.id
+      });
+      if (!error && data) {
+        await fetchUsernames(); // Refresh the usernames list
+      }
+      return !!data;
+    } catch (err) {
+      console.error('Error making user admin:', err);
+      return false;
+    }
+  };
+
+  // Remove user admin
+  const removeUserAdmin = async (targetUserId: string) => {
+    try {
+      if (!user) return false;
+      const { data, error } = await supabase.rpc('remove_user_admin', { 
+        target_user_id: targetUserId,
+        requesting_user_id: user.id
+      });
+      if (!error && data) {
+        await fetchUsernames(); // Refresh the usernames list
+      }
+      return !!data;
+    } catch (err) {
+      console.error('Error removing user admin:', err);
+      return false;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
         user,
         session,
         loading,
+        isAdmin,
         signUp,
         signIn,
         signOut,
@@ -160,6 +256,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         fetchUsernames,
         selectedUsername,
         setSelectedUsername,
+        makeUserAdmin,
+        removeUserAdmin,
       }}
     >
       {children}
