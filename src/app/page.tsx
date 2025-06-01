@@ -1,7 +1,5 @@
 "use client";
 
-import AccountButton from '@/components/AccountButton';
-
 export default function Home() {
   return (
     <div style={{
@@ -10,11 +8,6 @@ export default function Home() {
       scrollSnapType: 'y mandatory',
       scrollBehavior: 'smooth'
     }}>
-      {/* Account Button - Fixed position across all sections */}
-      <div style={{ position: 'fixed', zIndex: 1000 }}>
-        <AccountButton />
-      </div>
-
       {/* Section 1 - Original Background (clean, no overlay) */}
       <section style={{
         width: '100vw',
@@ -27,7 +20,7 @@ export default function Home() {
       }}>
       </section>
 
-      {/* Section 2 - French Connection */}
+      {/* Section 2 - French Connection with Poem */}
       <section style={{
         width: '100vw',
         height: '100vh',
@@ -38,32 +31,71 @@ export default function Home() {
         scrollSnapAlign: 'start',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        position: 'relative'
       }}>
-        {/* Content overlay for French Connection section */}
+        {/* Poem Overlay */}
         <div style={{
-          textAlign: 'center',
-          color: 'white',
-          textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
-          background: 'rgba(0,0,0,0.4)',
-          padding: '2rem',
-          borderRadius: '15px',
-          backdropFilter: 'blur(10px)'
+          background: 'rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '20px',
+          padding: '3rem',
+          maxWidth: '500px',
+          textAlign: 'left',
+          fontFamily: 'Georgia, serif',
+          lineHeight: '1.8',
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.5)'
         }}>
-          <h2 style={{ 
-            fontSize: '3rem', 
-            margin: '0 0 1rem 0',
-            fontWeight: 'bold'
+          <h2 style={{
+            color: '#fff',
+            fontSize: '2rem',
+            fontWeight: 'bold',
+            marginBottom: '2rem',
+            textAlign: 'center',
+            letterSpacing: '2px',
+            textTransform: 'uppercase',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+            paddingBottom: '1rem'
           }}>
-            French Connection
+            Eating Asshole
           </h2>
-          <p style={{ 
-            fontSize: '1.3rem', 
-            margin: 0,
-            opacity: 0.9
+          
+          <div style={{
+            color: '#f0f0f0',
+            fontSize: '1.1rem',
+            whiteSpace: 'pre-line',
+            fontStyle: 'italic'
           }}>
-            Discover the art of expression
-          </p>
+            {`In real life
+Girls never bend over
+With a clean asshole
+And let you
+Fuck it with
+Her best friend's tongue
+
+Instead
+They always have to pee
+While you're watching
+The French Connection.
+
+And it spoils the flow
+Of that awesome car chase,
+
+Later,
+You have a nightmare
+About snakes.`}
+          </div>
+          
+          <div style={{
+            marginTop: '2rem',
+            textAlign: 'right',
+            color: 'rgba(255, 255, 255, 0.6)',
+            fontSize: '0.9rem',
+            fontStyle: 'normal'
+          }}>
+            — BadAssPoet
+          </div>
         </div>
       </section>
     </div>
