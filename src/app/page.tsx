@@ -98,6 +98,18 @@ About snakes.`}
           </div>
         </div>
       </section>
+
+      {/* Section 3 - Photographology */}
+      <section style={{
+        width: '100vw',
+        height: '100vh',
+        backgroundImage: 'url(/photographology.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        scrollSnapAlign: 'start'
+      }}>
+      </section>
     </div>
   );
 }
