@@ -14,11 +14,14 @@ export default function Home() {
       <section style={{
         width: '100vw',
         height: '100vh',
+        minHeight: '100vh',
         backgroundImage: 'url(/background.png)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
-        scrollSnapAlign: 'start'
+        scrollSnapAlign: 'start',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
       </section>
 
@@ -26,6 +29,7 @@ export default function Home() {
       <section style={{
         width: '100vw',
         height: '100vh',
+        minHeight: '100vh',
         backgroundImage: 'url(/french-connection.png)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -34,7 +38,8 @@ export default function Home() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        position: 'relative'
+        position: 'relative',
+        overflow: 'hidden'
       }}>
         {/* Poem Overlay */}
         <div style={{
@@ -105,6 +110,7 @@ About snakes.`}
       <section style={{
         width: '100vw',
         height: '100vh',
+        minHeight: '100vh',
         backgroundImage: 'url(/photographology.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -113,7 +119,8 @@ About snakes.`}
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        overflow: 'hidden'
       }}>
         <PoetryGame />
       </section>
