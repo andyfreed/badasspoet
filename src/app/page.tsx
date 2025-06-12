@@ -1,5 +1,7 @@
 "use client";
 
+import PoetryGame from '../components/PoetryGame';
+
 export default function Home() {
   return (
     <div style={{
@@ -99,7 +101,7 @@ About snakes.`}
         </div>
       </section>
 
-      {/* Section 3 - Photographology */}
+      {/* Section 3 - Photographology with Poetry Game */}
       <section style={{
         width: '100vw',
         height: '100vh',
@@ -107,8 +109,13 @@ About snakes.`}
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
-        scrollSnapAlign: 'start'
+        scrollSnapAlign: 'start',
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
       }}>
+        <PoetryGame />
       </section>
     </div>
   );
