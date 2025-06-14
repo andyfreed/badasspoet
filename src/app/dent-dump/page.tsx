@@ -204,19 +204,11 @@ export default function DentDump() {
             color: 'white',
             fontSize: '2rem',
             fontWeight: 'bold',
-            marginBottom: '1rem',
+            marginBottom: '2rem',
             textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
           }}>
-            Access Required
+            Fuck you.
           </h1>
-          
-          <p style={{
-            color: 'rgba(255,255,255,0.8)',
-            fontSize: '1rem',
-            marginBottom: '2rem'
-          }}>
-            Enter password to access Dent Dump
-          </p>
           
           <form onSubmit={handlePasswordSubmit} style={{ width: '100%' }}>
             <input
@@ -271,9 +263,9 @@ export default function DentDump() {
                 e.currentTarget.style.background = 'white';
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
-            >
-              Access Dent Dump
-            </button>
+                          >
+                Enter
+              </button>
           </form>
         </div>
       </div>
@@ -295,7 +287,7 @@ export default function DentDump() {
           textAlign: 'center'
         }}>
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📁</div>
-          Loading files from Synology NAS...
+          Loading files...
         </div>
       </div>
     );
@@ -353,12 +345,6 @@ export default function DentDump() {
           }}>
             Dent Dump
           </h1>
-          <p style={{
-            color: 'rgba(255,255,255,0.8)',
-            fontSize: '1.2rem'
-          }}>
-            Your personal Synology NAS file storage space
-          </p>
         </div>
 
         {/* Upload Area */}
@@ -408,7 +394,7 @@ export default function DentDump() {
             color: 'rgba(255,255,255,0.7)',
             fontSize: '1rem'
           }}>
-            Or click to browse files • Files will be stored on your Synology NAS
+            Or click to browse files
           </p>
           
           {uploading && (
@@ -417,7 +403,7 @@ export default function DentDump() {
               color: 'white',
               fontSize: '1rem'
             }}>
-              Uploading files to Synology NAS...
+              Uploading files...
             </div>
           )}
         </div>
@@ -439,7 +425,7 @@ export default function DentDump() {
               borderBottom: '1px solid rgba(255,255,255,0.2)',
               paddingBottom: '1rem'
             }}>
-              Synology NAS Files ({files.length})
+              Files ({files.length})
             </h2>
             
             <div style={{
@@ -556,7 +542,7 @@ export default function DentDump() {
             fontSize: '1.1rem',
             marginTop: '2rem'
           }}>
-            No files on your Synology NAS yet. Drag and drop some files to get started!
+            No files yet. Drag and drop some files to get started!
           </div>
         )}
       </div>
