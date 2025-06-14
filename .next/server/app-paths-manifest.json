@@ -1,1 +1,4 @@
-{}
+{
+  "/api/synology/download/route": "app/api/synology/download/route.js",
+  "/api/synology/list/route": "app/api/synology/list/route.js"
+}

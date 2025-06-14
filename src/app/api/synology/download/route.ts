@@ -40,21 +40,31 @@ export async function POST(request: NextRequest) {
 
     const sid = loginData.data.sid;
 
-    // Step 2: Create download link
-    const downloadUrl = `${synologyUrl}/webapi/entry.cgi?` + new URLSearchParams({
+    // Step 2: Download the file directly and stream it
+    const downloadResponse = await fetch(`${synologyUrl}/webapi/entry.cgi?` + new URLSearchParams({
       api: 'SYNO.FileStation.Download',
       version: '2',
       method: 'download',
       path: path,
       mode: 'download',
       _sid: sid
-    });
+    }));
 
-    // Don't logout here - the download link needs the session to be active
-    // The session will expire after some time automatically
+    if (!downloadResponse.ok) {
+      return NextResponse.json({ error: 'Failed to download file from Synology' }, { status: 500 });
+    }
 
-    return NextResponse.json({
-      downloadUrl: downloadUrl
+    // Get the filename from the path
+    const filename = path.split('/').pop() || 'download';
+    
+    // Stream the file back to the client
+    const headers = new Headers();
+    headers.set('Content-Disposition', `attachment; filename="${filename}"`);
+    headers.set('Content-Type', downloadResponse.headers.get('Content-Type') || 'application/octet-stream');
+    
+    return new NextResponse(downloadResponse.body, {
+      status: 200,
+      headers: headers
     });
 
   } catch (error) {

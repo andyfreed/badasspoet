@@ -100,11 +100,18 @@ export default function DentDump() {
       });
       
       if (response.ok) {
-        const data = await response.json();
-        // Open download link in new tab
-        window.open(data.downloadUrl, '_blank');
+        // Create a blob from the response and download it
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = file.name;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
       } else {
-        console.error('Failed to get download link');
+        console.error('Failed to download file');
       }
     } catch (error) {
       console.error('Error downloading file:', error);
