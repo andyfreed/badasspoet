@@ -1,9 +1,3 @@
 {
-  "pages": {
-    "/api/synology/list/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/synology/list/route.js"
-    ]
-  }
+  "pages": {}
 }

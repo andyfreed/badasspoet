@@ -17,7 +17,7 @@ export default function DentDump() {
   const [loading, setLoading] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Load files from Dropbox on component mount
+  // Load files from Synology NAS on component mount
   useEffect(() => {
     loadFiles();
   }, []);
