@@ -15,12 +15,28 @@ export default function DentDump() {
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [showError, setShowError] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Load files from Synology NAS on component mount
+  // Load files from Synology NAS on component mount (only if authenticated)
   useEffect(() => {
-    loadFiles();
-  }, []);
+    if (isAuthenticated) {
+      loadFiles();
+    }
+  }, [isAuthenticated]);
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === 'butthead') {
+      setIsAuthenticated(true);
+      setShowError(false);
+    } else {
+      setShowError(true);
+      setPassword('');
+    }
+  };
 
   const loadFiles = async () => {
     try {
@@ -155,6 +171,112 @@ export default function DentDump() {
     return new Date(dateString).toLocaleString();
   };
 
+  // Show password form if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '2rem'
+      }}>
+        <div style={{
+          background: 'rgba(255,255,255,0.1)',
+          backdropFilter: 'blur(10px)',
+          borderRadius: '20px',
+          padding: '3rem',
+          border: '1px solid rgba(255,255,255,0.2)',
+          maxWidth: '400px',
+          width: '100%',
+          textAlign: 'center'
+        }}>
+          <div style={{
+            fontSize: '4rem',
+            marginBottom: '2rem'
+          }}>
+            🔒
+          </div>
+          
+          <h1 style={{
+            color: 'white',
+            fontSize: '2rem',
+            fontWeight: 'bold',
+            marginBottom: '1rem',
+            textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
+          }}>
+            Access Required
+          </h1>
+          
+          <p style={{
+            color: 'rgba(255,255,255,0.8)',
+            fontSize: '1rem',
+            marginBottom: '2rem'
+          }}>
+            Enter password to access Dent Dump
+          </p>
+          
+          <form onSubmit={handlePasswordSubmit} style={{ width: '100%' }}>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter password"
+              style={{
+                width: '100%',
+                padding: '1rem',
+                borderRadius: '10px',
+                border: showError ? '2px solid #ef4444' : '1px solid rgba(255,255,255,0.3)',
+                background: 'rgba(255,255,255,0.1)',
+                color: 'white',
+                fontSize: '1rem',
+                marginBottom: '1rem',
+                outline: 'none',
+                backdropFilter: 'blur(10px)'
+              }}
+              autoFocus
+            />
+            
+            {showError && (
+              <p style={{
+                color: '#ef4444',
+                fontSize: '0.9rem',
+                marginBottom: '1rem'
+              }}>
+                Incorrect password. Try again.
+              </p>
+            )}
+            
+            <button
+              type="submit"
+              style={{
+                width: '100%',
+                padding: '1rem',
+                borderRadius: '10px',
+                border: 'none',
+                background: '#10b981',
+                color: 'white',
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#059669';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#10b981';
+              }}
+            >
+              Access Dent Dump
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div style={{
@@ -189,8 +311,36 @@ export default function DentDump() {
         {/* Header */}
         <div style={{
           textAlign: 'center',
-          marginBottom: '3rem'
+          marginBottom: '3rem',
+          position: 'relative'
         }}>
+          <button
+            onClick={() => setIsAuthenticated(false)}
+            style={{
+              position: 'absolute',
+              top: '0',
+              right: '0',
+              background: 'rgba(255,255,255,0.1)',
+              color: 'rgba(255,255,255,0.8)',
+              border: '1px solid rgba(255,255,255,0.3)',
+              borderRadius: '8px',
+              padding: '0.5rem 1rem',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.2)';
+              e.currentTarget.style.color = 'white';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+              e.currentTarget.style.color = 'rgba(255,255,255,0.8)';
+            }}
+          >
+            🔒 Logout
+          </button>
+          
           <h1 style={{
             color: 'white',
             fontSize: '3rem',

@@ -1,9 +1,9 @@
 {
   "/api/synology/download/route": "app/api/synology/download/route.js",
-  "/api/synology/delete/route": "app/api/synology/delete/route.js",
-  "/_not-found/page": "app/_not-found/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
   "/api/synology/list/route": "app/api/synology/list/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/synology/delete/route": "app/api/synology/delete/route.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
   "/api/synology/upload/route": "app/api/synology/upload/route.js",
   "/page": "app/page.js",
   "/dent-dump/page": "app/dent-dump/page.js"
