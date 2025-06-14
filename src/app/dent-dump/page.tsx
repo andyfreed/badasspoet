@@ -176,21 +176,22 @@ export default function DentDump() {
     return (
       <div style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         padding: '2rem'
       }}>
         <div style={{
-          background: 'rgba(255,255,255,0.1)',
+          background: 'rgba(255,255,255,0.05)',
           backdropFilter: 'blur(10px)',
           borderRadius: '20px',
           padding: '3rem',
-          border: '1px solid rgba(255,255,255,0.2)',
+          border: '1px solid rgba(255,255,255,0.1)',
           maxWidth: '400px',
           width: '100%',
-          textAlign: 'center'
+          textAlign: 'center',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
         }}>
           <div style={{
             fontSize: '4rem',
@@ -227,8 +228,8 @@ export default function DentDump() {
                 width: '100%',
                 padding: '1rem',
                 borderRadius: '10px',
-                border: showError ? '2px solid #ef4444' : '1px solid rgba(255,255,255,0.3)',
-                background: 'rgba(255,255,255,0.1)',
+                border: showError ? '2px solid #ef4444' : '1px solid rgba(255,255,255,0.2)',
+                background: 'rgba(255,255,255,0.05)',
                 color: 'white',
                 fontSize: '1rem',
                 marginBottom: '1rem',
@@ -254,19 +255,21 @@ export default function DentDump() {
                 width: '100%',
                 padding: '1rem',
                 borderRadius: '10px',
-                border: 'none',
-                background: '#10b981',
-                color: 'white',
+                border: '1px solid rgba(255,255,255,0.3)',
+                background: 'white',
+                color: 'black',
                 fontSize: '1rem',
                 fontWeight: 'bold',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#059669';
+                e.currentTarget.style.background = 'rgba(255,255,255,0.9)';
+                e.currentTarget.style.transform = 'translateY(-1px)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#10b981';
+                e.currentTarget.style.background = 'white';
+                e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
               Access Dent Dump
@@ -281,7 +284,7 @@ export default function DentDump() {
     return (
       <div style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
@@ -299,11 +302,11 @@ export default function DentDump() {
   }
 
   return (
-    <div style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        padding: '2rem'
-      }}>
+        <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
+      padding: '2rem'
+    }}>
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto'
@@ -320,9 +323,9 @@ export default function DentDump() {
               position: 'absolute',
               top: '0',
               right: '0',
-              background: 'rgba(255,255,255,0.1)',
-              color: 'rgba(255,255,255,0.8)',
-              border: '1px solid rgba(255,255,255,0.3)',
+              background: 'rgba(255,255,255,0.05)',
+              color: 'rgba(255,255,255,0.7)',
+              border: '1px solid rgba(255,255,255,0.2)',
               borderRadius: '8px',
               padding: '0.5rem 1rem',
               cursor: 'pointer',
@@ -330,12 +333,12 @@ export default function DentDump() {
               transition: 'all 0.2s ease'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.2)';
-              e.currentTarget.style.color = 'white';
+              e.currentTarget.style.background = 'white';
+              e.currentTarget.style.color = 'black';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
-              e.currentTarget.style.color = 'rgba(255,255,255,0.8)';
+              e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+              e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
             }}
           >
             🔒 Logout
@@ -365,13 +368,13 @@ export default function DentDump() {
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
           style={{
-            border: isDragging ? '3px dashed #4ade80' : '3px dashed rgba(255,255,255,0.3)',
+            border: isDragging ? '3px dashed white' : '3px dashed rgba(255,255,255,0.2)',
             borderRadius: '20px',
             padding: '4rem 2rem',
             textAlign: 'center',
             background: isDragging 
-              ? 'rgba(74, 222, 128, 0.1)' 
-              : 'rgba(255,255,255,0.1)',
+              ? 'rgba(255, 255, 255, 0.1)' 
+              : 'rgba(255,255,255,0.05)',
             backdropFilter: 'blur(10px)',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
@@ -411,7 +414,7 @@ export default function DentDump() {
           {uploading && (
             <div style={{
               marginTop: '1rem',
-              color: '#4ade80',
+              color: 'white',
               fontSize: '1rem'
             }}>
               Uploading files to Synology NAS...
@@ -422,11 +425,12 @@ export default function DentDump() {
         {/* Files List */}
         {files.length > 0 && (
           <div style={{
-            background: 'rgba(255,255,255,0.1)',
+            background: 'rgba(255,255,255,0.05)',
             backdropFilter: 'blur(10px)',
             borderRadius: '20px',
             padding: '2rem',
-            border: '1px solid rgba(255,255,255,0.2)'
+            border: '1px solid rgba(255,255,255,0.1)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
           }}>
             <h2 style={{
               color: 'white',
@@ -446,20 +450,22 @@ export default function DentDump() {
                 <div
                   key={file.id}
                   style={{
-                    background: 'rgba(255,255,255,0.1)',
+                    background: 'rgba(255,255,255,0.03)',
                     borderRadius: '10px',
                     padding: '1.5rem',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    border: '1px solid rgba(255,255,255,0.1)',
+                    border: '1px solid rgba(255,255,255,0.08)',
                     transition: 'all 0.3s ease'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.15)';
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
+                    e.currentTarget.style.border = '1px solid rgba(255,255,255,0.15)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+                    e.currentTarget.style.border = '1px solid rgba(255,255,255,0.08)';
                   }}
                 >
                   <div style={{ flex: 1 }}>
@@ -490,9 +496,9 @@ export default function DentDump() {
                     <button
                       onClick={() => handleDownload(file)}
                       style={{
-                        background: '#10b981',
-                        color: 'white',
-                        border: 'none',
+                        background: 'white',
+                        color: 'black',
+                        border: '1px solid rgba(255,255,255,0.3)',
                         borderRadius: '8px',
                         padding: '0.5rem 1rem',
                         cursor: 'pointer',
@@ -501,10 +507,12 @@ export default function DentDump() {
                         transition: 'all 0.2s ease'
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.background = '#059669';
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.9)';
+                        e.currentTarget.style.transform = 'translateY(-1px)';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.background = '#10b981';
+                        e.currentTarget.style.background = 'white';
+                        e.currentTarget.style.transform = 'translateY(0)';
                       }}
                     >
                       Download
@@ -513,9 +521,9 @@ export default function DentDump() {
                     <button
                       onClick={() => handleDelete(file)}
                       style={{
-                        background: '#ef4444',
+                        background: 'rgba(255,255,255,0.1)',
                         color: 'white',
-                        border: 'none',
+                        border: '1px solid rgba(255,255,255,0.3)',
                         borderRadius: '8px',
                         padding: '0.5rem 1rem',
                         cursor: 'pointer',
@@ -524,10 +532,12 @@ export default function DentDump() {
                         transition: 'all 0.2s ease'
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.background = '#dc2626';
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.2)';
+                        e.currentTarget.style.transform = 'translateY(-1px)';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.background = '#ef4444';
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                        e.currentTarget.style.transform = 'translateY(0)';
                       }}
                     >
                       Delete
