@@ -1,89 +1,9 @@
 {
   "pages": {
-    "/_not-found/page": [
-      "static/chunks/webpack-60d835819e29e072.js",
-      "static/chunks/4bd1b696-edd73b72b9809ea9.js",
-      "static/chunks/684-ccb8f43db63dfb4f.js",
-      "static/chunks/main-app-cd5f2f0d164099b7.js",
-      "static/chunks/app/_not-found/page-c8ffbb9600de8aac.js"
-    ],
-    "/api/dropbox/delete/route": [
-      "static/chunks/webpack-60d835819e29e072.js",
-      "static/chunks/4bd1b696-edd73b72b9809ea9.js",
-      "static/chunks/684-ccb8f43db63dfb4f.js",
-      "static/chunks/main-app-cd5f2f0d164099b7.js",
-      "static/chunks/app/api/dropbox/delete/route-622c8d9731750a52.js"
-    ],
-    "/api/dropbox/download/route": [
-      "static/chunks/webpack-60d835819e29e072.js",
-      "static/chunks/4bd1b696-edd73b72b9809ea9.js",
-      "static/chunks/684-ccb8f43db63dfb4f.js",
-      "static/chunks/main-app-cd5f2f0d164099b7.js",
-      "static/chunks/app/api/dropbox/download/route-b36c5bf76f901e2f.js"
-    ],
-    "/api/dropbox/list/route": [
-      "static/chunks/webpack-60d835819e29e072.js",
-      "static/chunks/4bd1b696-edd73b72b9809ea9.js",
-      "static/chunks/684-ccb8f43db63dfb4f.js",
-      "static/chunks/main-app-cd5f2f0d164099b7.js",
-      "static/chunks/app/api/dropbox/list/route-7fceb50b078da2bc.js"
-    ],
-    "/api/dropbox/upload/route": [
-      "static/chunks/webpack-60d835819e29e072.js",
-      "static/chunks/4bd1b696-edd73b72b9809ea9.js",
-      "static/chunks/684-ccb8f43db63dfb4f.js",
-      "static/chunks/main-app-cd5f2f0d164099b7.js",
-      "static/chunks/app/api/dropbox/upload/route-3a7007deb802cfdf.js"
-    ],
-    "/api/synology/upload/route": [
-      "static/chunks/webpack-60d835819e29e072.js",
-      "static/chunks/4bd1b696-edd73b72b9809ea9.js",
-      "static/chunks/684-ccb8f43db63dfb4f.js",
-      "static/chunks/main-app-cd5f2f0d164099b7.js",
-      "static/chunks/app/api/synology/upload/route-a3f883e30e986353.js"
-    ],
-    "/api/synology/download/route": [
-      "static/chunks/webpack-60d835819e29e072.js",
-      "static/chunks/4bd1b696-edd73b72b9809ea9.js",
-      "static/chunks/684-ccb8f43db63dfb4f.js",
-      "static/chunks/main-app-cd5f2f0d164099b7.js",
-      "static/chunks/app/api/synology/download/route-2fdc34dc19c38fe8.js"
-    ],
-    "/api/synology/delete/route": [
-      "static/chunks/webpack-60d835819e29e072.js",
-      "static/chunks/4bd1b696-edd73b72b9809ea9.js",
-      "static/chunks/684-ccb8f43db63dfb4f.js",
-      "static/chunks/main-app-cd5f2f0d164099b7.js",
-      "static/chunks/app/api/synology/delete/route-e6b0adf0e46e2349.js"
-    ],
     "/api/synology/list/route": [
-      "static/chunks/webpack-60d835819e29e072.js",
-      "static/chunks/4bd1b696-edd73b72b9809ea9.js",
-      "static/chunks/684-ccb8f43db63dfb4f.js",
-      "static/chunks/main-app-cd5f2f0d164099b7.js",
-      "static/chunks/app/api/synology/list/route-651c925f237614e5.js"
-    ],
-    "/layout": [
-      "static/chunks/webpack-60d835819e29e072.js",
-      "static/chunks/4bd1b696-edd73b72b9809ea9.js",
-      "static/chunks/684-ccb8f43db63dfb4f.js",
-      "static/chunks/main-app-cd5f2f0d164099b7.js",
-      "static/css/0f0033205ccf5025.css",
-      "static/chunks/app/layout-bc8b5e0df34c0eab.js"
-    ],
-    "/page": [
-      "static/chunks/webpack-60d835819e29e072.js",
-      "static/chunks/4bd1b696-edd73b72b9809ea9.js",
-      "static/chunks/684-ccb8f43db63dfb4f.js",
-      "static/chunks/main-app-cd5f2f0d164099b7.js",
-      "static/chunks/app/page-4ad87643317647a7.js"
-    ],
-    "/dent-dump/page": [
-      "static/chunks/webpack-60d835819e29e072.js",
-      "static/chunks/4bd1b696-edd73b72b9809ea9.js",
-      "static/chunks/684-ccb8f43db63dfb4f.js",
-      "static/chunks/main-app-cd5f2f0d164099b7.js",
-      "static/chunks/app/dent-dump/page-07a37ff1deec481e.js"
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/synology/list/route.js"
     ]
   }
 }

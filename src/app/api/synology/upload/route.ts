@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     uploadFormData.append('api', 'SYNO.FileStation.Upload');
     uploadFormData.append('version', '2');
     uploadFormData.append('method', 'upload');
-    uploadFormData.append('path', '/web/dent-dump');
+    uploadFormData.append('path', '/FREEDSHARED/dent-dump');
     uploadFormData.append('create_parents', 'true');
     uploadFormData.append('overwrite', 'true');
     uploadFormData.append('_sid', sid);
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
       id: file.name,
       name: file.name,
       size: file.size,
-      path: `/web/dent-dump/${file.name}`,
+      path: `/FREEDSHARED/dent-dump/${file.name}`,
       uploadDate: new Date().toISOString()
     });
 

@@ -27,7 +27,15 @@ export async function GET() {
       })
     });
 
-    const loginData = await loginResponse.json();
+    const loginText = await loginResponse.text();
+    let loginData;
+    try {
+      loginData = JSON.parse(loginText);
+    } catch (error) {
+      console.error('Login response is not JSON:', loginText.substring(0, 200));
+      return NextResponse.json({ error: 'Failed to authenticate with Synology - invalid response' }, { status: 500 });
+    }
+    
     if (!loginData.success) {
       return NextResponse.json({ error: 'Failed to authenticate with Synology' }, { status: 500 });
     }
@@ -39,7 +47,7 @@ export async function GET() {
       api: 'SYNO.FileStation.List',
       version: '2',
       method: 'list',
-      folder_path: '/web/dent-dump',
+      folder_path: '/FREEDSHARED/dent-dump',
       additional: 'time,size',
       _sid: sid
     }));
@@ -75,9 +83,13 @@ export async function GET() {
       .map((entry: any) => ({
         id: entry.name,
         name: entry.name,
-        size: entry.additional.size,
+        size: entry.additional?.size || entry.size || 0,
         path: entry.path,
-        uploadDate: new Date(entry.additional.time.mtime * 1000).toISOString()
+        uploadDate: entry.additional?.time?.mtime 
+          ? new Date(entry.additional.time.mtime * 1000).toISOString()
+          : entry.time?.mtime
+          ? new Date(entry.time.mtime * 1000).toISOString()
+          : new Date().toISOString()
       }));
 
     return NextResponse.json({ files });
