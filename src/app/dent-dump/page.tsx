@@ -24,7 +24,7 @@ export default function DentDump() {
 
   const loadFiles = async () => {
     try {
-      const response = await fetch('/api/dropbox/list');
+      const response = await fetch('/api/synology/list');
       if (response.ok) {
         const data = await response.json();
         setFiles(data.files);
@@ -68,7 +68,7 @@ export default function DentDump() {
         const formData = new FormData();
         formData.append('file', file);
         
-        const response = await fetch('/api/dropbox/upload', {
+        const response = await fetch('/api/synology/upload', {
           method: 'POST',
           body: formData
         });
@@ -91,7 +91,7 @@ export default function DentDump() {
 
   const handleDownload = async (file: UploadedFile) => {
     try {
-      const response = await fetch('/api/dropbox/download', {
+      const response = await fetch('/api/synology/download', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -117,7 +117,7 @@ export default function DentDump() {
     }
     
     try {
-      const response = await fetch('/api/dropbox/delete', {
+      const response = await fetch('/api/synology/delete', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'
@@ -163,7 +163,7 @@ export default function DentDump() {
           textAlign: 'center'
         }}>
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📁</div>
-          Loading files from Dropbox...
+          Loading files from Synology NAS...
         </div>
       </div>
     );
@@ -197,7 +197,7 @@ export default function DentDump() {
             color: 'rgba(255,255,255,0.8)',
             fontSize: '1.2rem'
           }}>
-            Your personal Dropbox file storage space
+            Your personal Synology NAS file storage space
           </p>
         </div>
 
@@ -248,7 +248,7 @@ export default function DentDump() {
             color: 'rgba(255,255,255,0.7)',
             fontSize: '1rem'
           }}>
-            Or click to browse files • Files will be stored in your Dropbox
+            Or click to browse files • Files will be stored on your Synology NAS
           </p>
           
           {uploading && (
@@ -257,7 +257,7 @@ export default function DentDump() {
               color: '#4ade80',
               fontSize: '1rem'
             }}>
-              Uploading files to Dropbox...
+              Uploading files to Synology NAS...
             </div>
           )}
         </div>
@@ -278,7 +278,7 @@ export default function DentDump() {
               borderBottom: '1px solid rgba(255,255,255,0.2)',
               paddingBottom: '1rem'
             }}>
-              Dropbox Files ({files.length})
+              Synology NAS Files ({files.length})
             </h2>
             
             <div style={{
@@ -389,7 +389,7 @@ export default function DentDump() {
             fontSize: '1.1rem',
             marginTop: '2rem'
           }}>
-            No files in your Dropbox yet. Drag and drop some files to get started!
+            No files on your Synology NAS yet. Drag and drop some files to get started!
           </div>
         )}
       </div>
