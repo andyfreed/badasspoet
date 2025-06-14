@@ -1,1 +1,14 @@
-{}
+{
+  "/api/dropbox/delete/route": "app/api/dropbox/delete/route.js",
+  "/api/dropbox/download/route": "app/api/dropbox/download/route.js",
+  "/api/dropbox/list/route": "app/api/dropbox/list/route.js",
+  "/api/dropbox/upload/route": "app/api/dropbox/upload/route.js",
+  "/api/synology/upload/route": "app/api/synology/upload/route.js",
+  "/api/synology/download/route": "app/api/synology/download/route.js",
+  "/api/synology/delete/route": "app/api/synology/delete/route.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/api/synology/list/route": "app/api/synology/list/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/page": "app/page.js",
+  "/dent-dump/page": "app/dent-dump/page.js"
+}
