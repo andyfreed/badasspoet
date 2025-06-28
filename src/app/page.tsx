@@ -242,14 +242,7 @@ About snakes.`}
               justifyContent: 'center',
               cursor: loading ? 'not-allowed' : 'pointer',
               filter: loading ? 'grayscale(0.7)' : 'none',
-              transition: 'box-shadow 0.3s, filter 0.3s',
-              boxShadow: '0 0 0 0 rgba(255,255,255,0)',
-            }}
-            onMouseEnter={e => {
-              if (!loading) e.currentTarget.style.boxShadow = '0 0 40px 10px #fff8';
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.boxShadow = '0 0 0 0 rgba(255,255,255,0)';
+              transition: 'filter 0.3s',
             }}
             onClick={() => { if (!loading) playBigBigMammals(); }}
           >
