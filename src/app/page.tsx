@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
-import bigBigMammalsTape from '../assets/big-big-mammals-tape.png';
 
 export default function Home() {
   // Audio player state for photographology section
@@ -260,7 +259,7 @@ About snakes.`}
             onClick={() => { if (!loading) playBigBigMammals(); }}
           >
             <Image
-              src={bigBigMammalsTape}
+              src="/big-big-mammals-tape.png"
               alt="Big Big Mammals Tape"
               width={340}
               height={340}
