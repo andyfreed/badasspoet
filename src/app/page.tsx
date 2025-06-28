@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
+import { useRef as useDomRef } from 'react';
 
 export default function Home() {
   // Audio player state for photographology section
@@ -19,6 +20,10 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+
+  // Section refs for elevator navigation
+  const sectionRefs = [useDomRef<HTMLDivElement>(null), useDomRef<HTMLDivElement>(null), useDomRef<HTMLDivElement>(null)];
+  const [currentSection, setCurrentSection] = useState(0);
 
   // Helper to check if a file is audio
   const isAudioFile = (name: string) => /\.(mp3|wav|ogg)$/i.test(name);
@@ -164,15 +169,113 @@ export default function Home() {
   // Add digital font fallback
   const digitalFont = `'Orbitron', 'Share Tech Mono', 'VT323', 'monospace'`;
 
+  // Scroll to section
+  const scrollToSection = (idx: number) => {
+    sectionRefs[idx].current?.scrollIntoView({ behavior: 'smooth' });
+    setCurrentSection(idx);
+  };
+
+  // Listen for scroll to update display
+  useEffect(() => {
+    const onScroll = () => {
+      const offsets = sectionRefs.map(ref => ref.current?.getBoundingClientRect().top ?? 0);
+      const idx = offsets.findIndex(top => top > -window.innerHeight / 2);
+      setCurrentSection(idx === -1 ? 2 : idx);
+    };
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Elevator display labels
+  const sectionLabels = ['L', 'B1', 'B2'];
+
   return (
     <div style={{
       height: '100vh',
       overflowY: 'scroll',
       scrollSnapType: 'y mandatory',
-      scrollBehavior: 'smooth'
+      scrollBehavior: 'smooth',
+      position: 'relative',
     }}>
+      {/* Elevator Controls */}
+      <div style={{
+        position: 'fixed',
+        top: '50%',
+        right: 32,
+        transform: 'translateY(-50%)',
+        zIndex: 100,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 16,
+        userSelect: 'none',
+      }}>
+        {/* Up Button */}
+        <button
+          onClick={() => scrollToSection(Math.max(0, currentSection - 1))}
+          disabled={currentSection === 0}
+          style={{
+            width: 54,
+            height: 54,
+            borderRadius: '50%',
+            background: currentSection === 0 ? '#222' : 'radial-gradient(circle, #e0e0e0 60%, #888 100%)',
+            border: '3px solid #444',
+            boxShadow: '0 2px 12px #0008, 0 0 0 4px #fff2',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 8,
+            cursor: currentSection === 0 ? 'not-allowed' : 'pointer',
+            transition: 'background 0.2s',
+          }}
+          aria-label="Up"
+        >
+          <svg width="28" height="28" viewBox="0 0 24 24"><polygon points="12,5 19,17 5,17" fill="#a21caf" stroke="#fff" strokeWidth="2"/></svg>
+        </button>
+        {/* Digital Display */}
+        <div style={{
+          width: 54,
+          height: 38,
+          background: 'linear-gradient(180deg, #222 80%, #444 100%)',
+          border: '2.5px solid #a21caf',
+          borderRadius: 8,
+          boxShadow: '0 2px 12px #0008, 0 0 0 4px #fff2',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontFamily: digitalFont,
+          fontSize: 28,
+          color: '#e879f9',
+          letterSpacing: 2,
+          textShadow: '0 0 8px #e879f9, 0 0 16px #a21caf',
+          marginBottom: 8,
+        }}>
+          {sectionLabels[currentSection]}
+        </div>
+        {/* Down Button */}
+        <button
+          onClick={() => scrollToSection(Math.min(2, currentSection + 1))}
+          disabled={currentSection === 2}
+          style={{
+            width: 54,
+            height: 54,
+            borderRadius: '50%',
+            background: currentSection === 2 ? '#222' : 'radial-gradient(circle, #e0e0e0 60%, #888 100%)',
+            border: '3px solid #444',
+            boxShadow: '0 2px 12px #0008, 0 0 0 4px #fff2',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: currentSection === 2 ? 'not-allowed' : 'pointer',
+            transition: 'background 0.2s',
+          }}
+          aria-label="Down"
+        >
+          <svg width="28" height="28" viewBox="0 0 24 24"><polygon points="12,19 5,7 19,7" fill="#a21caf" stroke="#fff" strokeWidth="2"/></svg>
+        </button>
+      </div>
       {/* Section 1 - Original Background (clean, no overlay) */}
-      <section style={{
+      <section ref={sectionRefs[0]} style={{
         width: '100vw',
         height: '100vh',
         minHeight: '100vh',
@@ -187,7 +290,7 @@ export default function Home() {
       </section>
 
       {/* Section 2 - French Connection with Poem */}
-      <section style={{
+      <section ref={sectionRefs[1]} style={{
         width: '100vw',
         height: '100vh',
         minHeight: '100vh',
@@ -268,7 +371,7 @@ About snakes.`}
       </section>
 
       {/* Section 3 - Photographology (clean, no game) */}
-      <section style={{
+      <section ref={sectionRefs[2]} style={{
         width: '100vw',
         height: '100vh',
         minHeight: '100vh',
