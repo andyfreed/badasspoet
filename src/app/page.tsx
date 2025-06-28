@@ -18,7 +18,7 @@ export default function Home() {
 
   useEffect(() => {
     // Only fetch on mount
-    fetch('/api/dropbox/list')
+    fetch('/api/synology/list')
       .then(res => res.json())
       .then(data => {
         if (data.files) {
@@ -30,14 +30,16 @@ export default function Home() {
   const fetchAudioUrl = async (file: AudioFile) => {
     setLoadingAudioId(file.id);
     try {
-      const response = await fetch('/api/dropbox/download', {
+      const response = await fetch('/api/synology/download', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ path: file.path })
       });
       if (response.ok) {
-        const data = await response.json();
-        setAudioUrls((prev) => ({ ...prev, [file.id]: data.downloadUrl }));
+        // For Synology, we expect a blob, so create an object URL
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        setAudioUrls((prev) => ({ ...prev, [file.id]: url }));
       }
     } finally {
       setLoadingAudioId(null);
@@ -175,7 +177,7 @@ About snakes.`}
           backdropFilter: 'blur(10px)'
         }}>
           <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem', letterSpacing: '2px', textTransform: 'uppercase' }}>Audio Files</h2>
-          {audioFiles.length === 0 && <div style={{ color: 'rgba(255,255,255,0.7)' }}>No audio files found in Dropbox.</div>}
+          {audioFiles.length === 0 && <div style={{ color: 'rgba(255,255,255,0.7)' }}>No audio files found in Synology.</div>}
           {audioFiles.map(file => (
             <div key={file.id} style={{ marginBottom: '2rem' }}>
               <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '0.5rem' }}>{file.name}</div>
