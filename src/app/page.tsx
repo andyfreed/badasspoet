@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
+import Image from 'next/image';
+import bigBigMammalsTape from '../assets/big-big-mammals-tape.png';
 
 export default function Home() {
   // Audio player state for photographology section
@@ -66,6 +68,33 @@ export default function Home() {
       audio.removeEventListener('ended', onPause);
     };
   }, [audioUrl]);
+
+  // Play the big-big-mammals audio file from Synology on click
+  const playBigBigMammals = async () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    setLoading(true);
+    // You may need to adjust the filename/extension if it's not .mp3
+    const filePath = '/FREEDSHARED/dent-dump/big-big-mammals.mp3';
+    const response = await fetch('/api/synology/download', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path: filePath })
+    });
+    if (response.ok) {
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      setAudioUrl(url);
+      setTimeout(() => {
+        if (audioRef.current) {
+          audioRef.current.play();
+        }
+      }, 100); // slight delay to ensure src is set
+    }
+    setLoading(false);
+  };
 
   // Reel SVG
   const Reel = ({ spinning }: { spinning: boolean }) => (
@@ -212,53 +241,35 @@ About snakes.`}
           textAlign: 'center',
           backdropFilter: 'blur(10px)'
         }}>
-          {audioFiles.length === 0 && <div style={{ color: 'rgba(255,255,255,0.7)' }}>No audio files found in Synology.</div>}
-          {audioFiles.length > 0 && (
-            <>
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label htmlFor="audio-select" style={{ fontWeight: 'bold', marginRight: 8 }}>Select Tape:</label>
-                <select
-                  id="audio-select"
-                  value={selectedId || ''}
-                  onChange={e => setSelectedId(e.target.value)}
-                  style={{
-                    padding: '0.5rem 1rem',
-                    borderRadius: '8px',
-                    border: '1px solid #888',
-                    fontSize: '1rem',
-                    background: '#222',
-                    color: 'white',
-                    outline: 'none',
-                    marginLeft: 4
-                  }}
-                >
-                  <option value="" disabled>Select a file...</option>
-                  {audioFiles.map(file => (
-                    <option key={file.id} value={file.id}>{file.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24, marginBottom: 24 }}>
-                <Reel spinning={!!audioUrl && isPlaying} />
-                <div style={{ width: 60, height: 8, background: '#888', borderRadius: 4, margin: '0 8px' }} />
-                <Reel spinning={!!audioUrl && isPlaying} />
-              </div>
-              <div style={{ marginBottom: 16 }}>
-                {!loading && audioUrl && (
-                  <audio
-                    ref={audioRef}
-                    src={audioUrl}
-                    controls
-                    style={{ width: '100%', background: 'rgba(0,0,0,0.2)', borderRadius: 8 }}
-                    onPlay={() => setIsPlaying(true)}
-                    onPause={() => setIsPlaying(false)}
-                    onEnded={() => setIsPlaying(false)}
-                  />
-                )}
-              </div>
-              {loading && <div style={{ color: '#4ade80', fontWeight: 'bold' }}>Loading tape...</div>}
-            </>
-          )}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              filter: loading ? 'grayscale(0.7)' : 'none',
+              transition: 'box-shadow 0.3s, filter 0.3s',
+              boxShadow: '0 0 0 0 rgba(255,255,255,0)',
+            }}
+            onMouseEnter={e => {
+              if (!loading) e.currentTarget.style.boxShadow = '0 0 40px 10px #fff8';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.boxShadow = '0 0 0 0 rgba(255,255,255,0)';
+            }}
+            onClick={() => { if (!loading) playBigBigMammals(); }}
+          >
+            <Image
+              src={bigBigMammalsTape}
+              alt="Big Big Mammals Tape"
+              width={340}
+              height={340}
+              style={{ borderRadius: 16, width: '100%', height: 'auto', maxWidth: 340 }}
+              priority
+            />
+          </div>
+          {loading && <div style={{ color: '#4ade80', fontWeight: 'bold', marginTop: 16 }}>Loading tape...</div>}
+          <audio ref={audioRef} src={audioUrl || undefined} style={{ display: 'none' }} />
         </div>
       </section>
     </div>
