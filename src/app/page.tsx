@@ -319,33 +319,30 @@ About snakes.`}
             <div
               style={{
                 width: '100%',
-                height: 36,
-                background: 'rgba(30, 20, 40, 0.7)',
-                borderRadius: 10,
-                boxShadow: '0 4px 32px 0 #a21caf55, 0 1.5px 0 #fff2',
+                height: 28,
+                background: '#fff',
+                borderRadius: 6,
+                border: '1.5px solid #222',
                 position: 'relative',
                 marginBottom: 8,
                 overflow: 'visible',
                 display: 'flex',
                 alignItems: 'center',
-                border: '1.5px solid #a21caf55',
-                backdropFilter: 'blur(2px)',
                 cursor: duration > 0 ? 'pointer' : 'default',
               }}
               onClick={duration > 0 ? handleSeek : undefined}
             >
-              {/* Neon Bar */}
+              {/* Progress Fill */}
               <div
                 style={{
                   position: 'absolute',
-                  left: 48,
+                  left: 40,
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  width: duration > 0 ? `calc(${(currentTime / duration) * 100}% - 48px)` : 0,
-                  height: 8,
-                  background: 'linear-gradient(90deg, #e879f9 0%, #a21caf 100%)',
-                  boxShadow: '0 0 12px 2px #e879f9, 0 0 32px 8px #a21caf55',
-                  borderRadius: 4,
+                  width: duration > 0 ? `calc(${(currentTime / duration) * 100}% - 40px)` : 0,
+                  height: 6,
+                  background: '#111',
+                  borderRadius: 3,
                   zIndex: 2,
                   transition: 'width 0.2s',
                 }}
@@ -354,13 +351,13 @@ About snakes.`}
               <div
                 style={{
                   position: 'absolute',
-                  left: 48,
+                  left: 40,
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  width: 'calc(100% - 120px)',
-                  height: 8,
-                  background: 'linear-gradient(90deg, #3b0764 0%, #27272a 100%)',
-                  borderRadius: 4,
+                  width: 'calc(100% - 100px)',
+                  height: 6,
+                  background: '#e5e5e5',
+                  borderRadius: 3,
                   zIndex: 1,
                 }}
               />
@@ -369,14 +366,13 @@ About snakes.`}
                 <div
                   style={{
                     position: 'absolute',
-                    left: `calc(48px + ${(currentTime / duration) * (420 - 120)}px - 14px)` ,
+                    left: `calc(40px + ${(currentTime / duration) * (420 - 100)}px - 10px)` ,
                     top: '50%',
                     transform: 'translateY(-50%)',
-                    width: 28,
-                    height: 28,
-                    background: 'radial-gradient(circle, #e879f9 60%, #a21caf 100%)',
-                    border: '3px solid #fff',
-                    boxShadow: '0 0 16px 4px #e879f9, 0 0 32px 8px #a21caf55',
+                    width: 20,
+                    height: 20,
+                    background: '#fff',
+                    border: '2px solid #111',
                     borderRadius: '50%',
                     zIndex: 3,
                     pointerEvents: 'none',
@@ -388,32 +384,31 @@ About snakes.`}
                 onClick={handlePlayPause}
                 style={{
                   position: 'absolute',
-                  left: 8,
+                  left: 4,
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  background: 'radial-gradient(circle, #e879f9 60%, #a21caf 100%)',
-                  border: '2px solid #fff',
+                  background: '#fff',
+                  border: '2px solid #111',
                   borderRadius: '50%',
-                  width: 32,
-                  height: 32,
+                  width: 28,
+                  height: 28,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: '0 0 12px 2px #e879f9, 0 0 32px 8px #a21caf55',
                   cursor: duration > 0 ? 'pointer' : 'not-allowed',
                   zIndex: 4,
-                  transition: 'background 0.2s',
                   outline: 'none',
+                  padding: 0,
                 }}
                 disabled={duration === 0}
                 aria-label={isPlaying ? 'Stop' : 'Play'}
               >
                 {isPlaying ? (
                   // Stop icon
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="6" y="6" width="12" height="12" rx="3" fill="#fff"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="6" y="6" width="12" height="12" rx="2" fill="#111"/></svg>
                 ) : (
                   // Play icon
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><polygon points="7,5 21,12 7,19" fill="#fff"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><polygon points="7,5 21,12 7,19" fill="#111"/></svg>
                 )}
               </button>
               {/* Time Display */}
@@ -423,13 +418,16 @@ About snakes.`}
                   right: 16,
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  color: '#e879f9',
+                  color: '#111',
                   fontFamily: digitalFont,
-                  fontSize: 28,
-                  letterSpacing: 2,
-                  textShadow: '0 0 8px #e879f9, 0 0 16px #a21caf',
+                  fontSize: 18,
+                  letterSpacing: 1,
                   zIndex: 5,
                   userSelect: 'none',
+                  background: '#fff',
+                  padding: '0 6px',
+                  borderRadius: 4,
+                  border: '1px solid #ccc',
                 }}
               >
                 {formatTime(currentTime)}
