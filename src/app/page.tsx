@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 export default function Home() {
   // Audio player state for photographology section
@@ -10,8 +10,11 @@ export default function Home() {
     path: string;
   }
   const [audioFiles, setAudioFiles] = useState<AudioFile[]>([]);
-  const [audioUrls, setAudioUrls] = useState<{ [id: string]: string }>({});
-  const [loadingAudioId, setLoadingAudioId] = useState<string | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   // Helper to check if a file is audio
   const isAudioFile = (name: string) => /\.(mp3|wav|ogg)$/i.test(name);
@@ -27,24 +30,57 @@ export default function Home() {
       });
   }, []);
 
-  const fetchAudioUrl = async (file: AudioFile) => {
-    setLoadingAudioId(file.id);
-    try {
-      const response = await fetch('/api/synology/download', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ path: file.path })
-      });
-      if (response.ok) {
-        // For Synology, we expect a blob, so create an object URL
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        setAudioUrls((prev) => ({ ...prev, [file.id]: url }));
-      }
-    } finally {
-      setLoadingAudioId(null);
+  // Fetch audio when selection changes
+  useEffect(() => {
+    if (!selectedId) {
+      setAudioUrl(null);
+      return;
     }
-  };
+    const file = audioFiles.find(f => f.id === selectedId);
+    if (!file) return;
+    setLoading(true);
+    fetch('/api/synology/download', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path: file.path })
+    })
+      .then(res => res.blob())
+      .then(blob => {
+        setAudioUrl(window.URL.createObjectURL(blob));
+        setLoading(false);
+      });
+  }, [selectedId]);
+
+  // Reel animation control
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const onPlay = () => setIsPlaying(true);
+    const onPause = () => setIsPlaying(false);
+    audio.addEventListener('play', onPlay);
+    audio.addEventListener('pause', onPause);
+    audio.addEventListener('ended', onPause);
+    return () => {
+      audio.removeEventListener('play', onPlay);
+      audio.removeEventListener('pause', onPause);
+      audio.removeEventListener('ended', onPause);
+    };
+  }, [audioUrl]);
+
+  // Reel SVG
+  const Reel = ({ spinning }: { spinning: boolean }) => (
+    <svg width="60" height="60" viewBox="0 0 60 60">
+      <circle cx="30" cy="30" r="28" fill="#bbb" stroke="#888" strokeWidth="2" />
+      <circle cx="30" cy="30" r="10" fill="#eee" stroke="#888" strokeWidth="2" />
+      <g style={{ transformOrigin: '30px 30px', animation: spinning ? 'spin 1s linear infinite' : undefined }}>
+        <rect x="28" y="2" width="4" height="15" fill="#888" />
+        <rect x="28" y="43" width="4" height="15" fill="#888" />
+        <rect x="43" y="28" width="15" height="4" fill="#888" />
+        <rect x="2" y="28" width="15" height="4" fill="#888" />
+      </g>
+      <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
+    </svg>
+  );
 
   return (
     <div style={{
@@ -166,45 +202,64 @@ About snakes.`}
         justifyContent: 'center',
       }}>
         <div style={{
-          background: 'rgba(0,0,0,0.5)',
+          background: 'rgba(0,0,0,0.7)',
           borderRadius: '20px',
-          padding: '2rem',
-          maxWidth: '500px',
+          padding: '2.5rem 2rem',
+          maxWidth: '480px',
           width: '100%',
           color: 'white',
           boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
           textAlign: 'center',
           backdropFilter: 'blur(10px)'
         }}>
-          <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem', letterSpacing: '2px', textTransform: 'uppercase' }}>Audio Files</h2>
+          <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem', letterSpacing: '2px', textTransform: 'uppercase' }}>Reel-to-Reel Audio</h2>
           {audioFiles.length === 0 && <div style={{ color: 'rgba(255,255,255,0.7)' }}>No audio files found in Synology.</div>}
-          {audioFiles.map(file => (
-            <div key={file.id} style={{ marginBottom: '2rem' }}>
-              <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '0.5rem' }}>{file.name}</div>
-              {audioUrls[file.id] ? (
-                <audio controls src={audioUrls[file.id]} style={{ width: '100%' }} />
-              ) : (
-                <button
-                  onClick={() => fetchAudioUrl(file)}
+          {audioFiles.length > 0 && (
+            <>
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label htmlFor="audio-select" style={{ fontWeight: 'bold', marginRight: 8 }}>Select Tape:</label>
+                <select
+                  id="audio-select"
+                  value={selectedId || ''}
+                  onChange={e => setSelectedId(e.target.value)}
                   style={{
-                    background: '#3b82f6',
-                    color: 'white',
-                    border: 'none',
+                    padding: '0.5rem 1rem',
                     borderRadius: '8px',
-                    padding: '0.5rem 1.5rem',
-                    cursor: 'pointer',
+                    border: '1px solid #888',
                     fontSize: '1rem',
-                    fontWeight: 'bold',
-                    marginTop: '0.5rem',
-                    transition: 'all 0.2s ease'
+                    background: '#222',
+                    color: 'white',
+                    outline: 'none',
+                    marginLeft: 4
                   }}
-                  disabled={loadingAudioId === file.id}
                 >
-                  {loadingAudioId === file.id ? 'Loading...' : 'Play'}
-                </button>
-              )}
-            </div>
-          ))}
+                  <option value="" disabled>Select a file...</option>
+                  {audioFiles.map(file => (
+                    <option key={file.id} value={file.id}>{file.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24, marginBottom: 24 }}>
+                <Reel spinning={!!audioUrl && isPlaying} />
+                <div style={{ width: 60, height: 8, background: '#888', borderRadius: 4, margin: '0 8px' }} />
+                <Reel spinning={!!audioUrl && isPlaying} />
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                {!loading && audioUrl && (
+                  <audio
+                    ref={audioRef}
+                    src={audioUrl}
+                    controls
+                    style={{ width: '100%', background: 'rgba(0,0,0,0.2)', borderRadius: 8 }}
+                    onPlay={() => setIsPlaying(true)}
+                    onPause={() => setIsPlaying(false)}
+                    onEnded={() => setIsPlaying(false)}
+                  />
+                )}
+              </div>
+              {loading && <div style={{ color: '#4ade80', fontWeight: 'bold' }}>Loading tape...</div>}
+            </>
+          )}
         </div>
       </section>
     </div>
