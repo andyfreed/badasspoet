@@ -16,6 +16,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Helper to check if a file is audio
   const isAudioFile = (name: string) => /\.(mp3|wav|ogg)$/i.test(name);
@@ -75,22 +76,33 @@ export default function Home() {
       audioRef.current.currentTime = 0;
     }
     setLoading(true);
-    // Updated filename to v2
+    setError(null);
     const filePath = '/FREEDSHARED/dent-dump/big-big-mammals-v2.mp3';
-    const response = await fetch('/api/synology/download', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ path: filePath })
-    });
-    if (response.ok) {
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      setAudioUrl(url);
-      setTimeout(() => {
-        if (audioRef.current) {
-          audioRef.current.play();
-        }
-      }, 100); // slight delay to ensure src is set
+    try {
+      const response = await fetch('/api/synology/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: filePath })
+      });
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        setAudioUrl(url);
+        setTimeout(() => {
+          if (audioRef.current) {
+            audioRef.current.play();
+          }
+        }, 100);
+      } else {
+        let errMsg = 'Failed to load audio.';
+        try {
+          const errJson = await response.json();
+          errMsg = errJson.error || errMsg;
+        } catch {}
+        setError(errMsg);
+      }
+    } catch (err) {
+      setError('Network error. Please try again.');
     }
     setLoading(false);
   };
@@ -256,6 +268,7 @@ About snakes.`}
             />
           </div>
           {loading && <div style={{ color: '#4ade80', fontWeight: 'bold', marginTop: 16 }}>Loading tape...</div>}
+          {error && <div style={{ color: '#f87171', fontWeight: 'bold', marginTop: 16 }}>{error}</div>}
           <audio ref={audioRef} src={audioUrl || undefined} style={{ display: 'none' }} />
         </div>
       </section>
