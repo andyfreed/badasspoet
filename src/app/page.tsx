@@ -230,15 +230,10 @@ About snakes.`}
         justifyContent: 'center',
       }}>
         <div style={{
-          background: 'rgba(0,0,0,0.35)',
-          borderRadius: '20px',
-          padding: '2.5rem 2rem',
-          maxWidth: '480px',
-          width: '100%',
-          color: 'white',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-          textAlign: 'center',
-          backdropFilter: 'blur(10px)'
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'column',
         }}>
           <div
             style={{
