@@ -75,8 +75,8 @@ export default function Home() {
       audioRef.current.currentTime = 0;
     }
     setLoading(true);
-    // You may need to adjust the filename/extension if it's not .mp3
-    const filePath = '/FREEDSHARED/dent-dump/big-big-mammals.mp3';
+    // Updated filename to v2
+    const filePath = '/FREEDSHARED/dent-dump/big-big-mammals-v2.mp3';
     const response = await fetch('/api/synology/download', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
