@@ -202,7 +202,7 @@ About snakes.`}
         justifyContent: 'center',
       }}>
         <div style={{
-          background: 'rgba(0,0,0,0.7)',
+          background: 'rgba(0,0,0,0.35)',
           borderRadius: '20px',
           padding: '2.5rem 2rem',
           maxWidth: '480px',
@@ -212,7 +212,6 @@ About snakes.`}
           textAlign: 'center',
           backdropFilter: 'blur(10px)'
         }}>
-          <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem', letterSpacing: '2px', textTransform: 'uppercase' }}>Reel-to-Reel Audio</h2>
           {audioFiles.length === 0 && <div style={{ color: 'rgba(255,255,255,0.7)' }}>No audio files found in Synology.</div>}
           {audioFiles.length > 0 && (
             <>
