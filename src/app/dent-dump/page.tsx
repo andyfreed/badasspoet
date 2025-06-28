@@ -148,6 +148,37 @@ export default function DentDump() {
     return new Date(dateString).toLocaleString();
   };
 
+  // Helper to check if a file is audio
+  const isAudioFile = (name: string) => {
+    return /\.(mp3|wav|ogg)$/i.test(name);
+  };
+
+  // Add state to store audio URLs
+  const [audioUrls, setAudioUrls] = useState<{ [id: string]: string }>({});
+  const [loadingAudioId, setLoadingAudioId] = useState<string | null>(null);
+
+  // Function to fetch and set audio URL for a file
+  const fetchAudioUrl = async (file: UploadedFile) => {
+    setLoadingAudioId(file.id);
+    try {
+      const response = await fetch('/api/dropbox/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: file.path })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setAudioUrls((prev) => ({ ...prev, [file.id]: data.downloadUrl }));
+      } else {
+        console.error('Failed to get audio link');
+      }
+    } catch (error) {
+      console.error('Error fetching audio link:', error);
+    } finally {
+      setLoadingAudioId(null);
+    }
+  };
+
   if (loading) {
     return (
       <div style={{
@@ -324,6 +355,33 @@ export default function DentDump() {
                       <span>{formatFileSize(file.size)}</span>
                       <span>{formatDate(file.uploadDate)}</span>
                     </div>
+                    {/* Audio player for audio files */}
+                    {isAudioFile(file.name) && (
+                      <div style={{ marginTop: '1rem' }}>
+                        {audioUrls[file.id] ? (
+                          <audio controls src={audioUrls[file.id]} style={{ width: '100%' }} />
+                        ) : (
+                          <button
+                            onClick={() => fetchAudioUrl(file)}
+                            style={{
+                              background: '#3b82f6',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '8px',
+                              padding: '0.5rem 1rem',
+                              cursor: 'pointer',
+                              fontSize: '0.9rem',
+                              fontWeight: 'bold',
+                              marginTop: '0.5rem',
+                              transition: 'all 0.2s ease'
+                            }}
+                            disabled={loadingAudioId === file.id}
+                          >
+                            {loadingAudioId === file.id ? 'Loading...' : 'Play'}
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
                   
                   <div style={{

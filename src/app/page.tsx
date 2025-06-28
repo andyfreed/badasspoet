@@ -1,6 +1,49 @@
 "use client";
 
+import { useEffect, useState } from 'react';
+
 export default function Home() {
+  // Audio player state for photographology section
+  interface AudioFile {
+    id: string;
+    name: string;
+    path: string;
+  }
+  const [audioFiles, setAudioFiles] = useState<AudioFile[]>([]);
+  const [audioUrls, setAudioUrls] = useState<{ [id: string]: string }>({});
+  const [loadingAudioId, setLoadingAudioId] = useState<string | null>(null);
+
+  // Helper to check if a file is audio
+  const isAudioFile = (name: string) => /\.(mp3|wav|ogg)$/i.test(name);
+
+  useEffect(() => {
+    // Only fetch on mount
+    fetch('/api/dropbox/list')
+      .then(res => res.json())
+      .then(data => {
+        if (data.files) {
+          setAudioFiles(data.files.filter((f: any) => isAudioFile(f.name)));
+        }
+      });
+  }, []);
+
+  const fetchAudioUrl = async (file: AudioFile) => {
+    setLoadingAudioId(file.id);
+    try {
+      const response = await fetch('/api/dropbox/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: file.path })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setAudioUrls((prev) => ({ ...prev, [file.id]: data.downloadUrl }));
+      }
+    } finally {
+      setLoadingAudioId(null);
+    }
+  };
+
   return (
     <div style={{
       height: '100vh',
@@ -115,8 +158,52 @@ About snakes.`}
         backgroundRepeat: 'no-repeat',
         scrollSnapAlign: 'start',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
       }}>
+        <div style={{
+          background: 'rgba(0,0,0,0.5)',
+          borderRadius: '20px',
+          padding: '2rem',
+          maxWidth: '500px',
+          width: '100%',
+          color: 'white',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+          textAlign: 'center',
+          backdropFilter: 'blur(10px)'
+        }}>
+          <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem', letterSpacing: '2px', textTransform: 'uppercase' }}>Audio Files</h2>
+          {audioFiles.length === 0 && <div style={{ color: 'rgba(255,255,255,0.7)' }}>No audio files found in Dropbox.</div>}
+          {audioFiles.map(file => (
+            <div key={file.id} style={{ marginBottom: '2rem' }}>
+              <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '0.5rem' }}>{file.name}</div>
+              {audioUrls[file.id] ? (
+                <audio controls src={audioUrls[file.id]} style={{ width: '100%' }} />
+              ) : (
+                <button
+                  onClick={() => fetchAudioUrl(file)}
+                  style={{
+                    background: '#3b82f6',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '0.5rem 1.5rem',
+                    cursor: 'pointer',
+                    fontSize: '1rem',
+                    fontWeight: 'bold',
+                    marginTop: '0.5rem',
+                    transition: 'all 0.2s ease'
+                  }}
+                  disabled={loadingAudioId === file.id}
+                >
+                  {loadingAudioId === file.id ? 'Loading...' : 'Play'}
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
       </section>
     </div>
   );
