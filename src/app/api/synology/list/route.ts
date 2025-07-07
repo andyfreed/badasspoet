@@ -48,7 +48,7 @@ export async function GET() {
       version: '2',
       method: 'list',
       folder_path: '/FREEDSHARED/dent-dump',
-      additional: 'real_path,size,owner,time,perm,type',
+      additional: 'size,time',
       _sid: sid
     }));
 
