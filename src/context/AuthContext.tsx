@@ -35,17 +35,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Check if current user is admin
   const checkAdminStatus = async (userId: string) => {
     try {
-      console.log('Checking admin status for user:', userId);
       const { data, error } = await supabase.rpc('is_user_admin', { user_uuid: userId });
-      console.log('Admin check result:', data, 'Error:', error);
       if (!error && data !== null && data !== undefined) {
         setIsAdmin(data);
       } else {
-        console.error('Admin check failed:', error);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Admin check failed:', error);
+        }
         setIsAdmin(false);
       }
     } catch (err) {
-      console.error('Error checking admin status:', err);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error checking admin status:', err);
+      }
       setIsAdmin(false);
     }
   };
@@ -64,7 +66,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const { data: authListener } = supabase.auth.onAuthStateChange(
         async (event, session) => {
-          console.log(`Auth event: ${event}`);
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`Auth event: ${event}`);
+          }
           setSession(session);
           setUser(session?.user || null);
           
@@ -93,22 +97,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Fetch available usernames
   const fetchUsernames = async () => {
     try {
-      console.log('Fetching usernames...');
       const { data, error } = await supabase
         .from('usernames')
         .select('*');
 
       if (error) {
-        console.error('Error fetching usernames:', error);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Error fetching usernames:', error);
+        }
         return;
       }
 
-      console.log('Fetched usernames:', data);
       // Sort the data manually if needed
       const sortedData = data ? [...data].sort((a, b) => a.username.localeCompare(b.username)) : [];
       setAvailableUsernames(sortedData);
     } catch (err) {
-      console.error('Error in fetchUsernames:', err);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error in fetchUsernames:', err);
+      }
     }
   };
 
@@ -142,7 +148,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         // Small delay to ensure user is properly created in the database
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 500));
 
         // Then claim the username
         const { data: claimData, error: claimError } = await supabase.rpc(
@@ -151,7 +157,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         );
 
         if (claimError) {
-          console.error('Error claiming username:', claimError);
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Error claiming username:', claimError);
+          }
           // Try to sign the user in anyway if username claim fails
           if (data.session) {
             setSession(data.session);
@@ -177,7 +185,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       return { data, error: null };
     } catch (err) {
-      console.error('Error in signUp:', err);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error in signUp:', err);
+      }
       return { error: err, data: null };
     }
   };
@@ -192,7 +202,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       return { data, error };
     } catch (err) {
-      console.error('Error in signIn:', err);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error in signIn:', err);
+      }
       return { error: err, data: null };
     }
   };
@@ -202,7 +214,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await supabase.auth.signOut();
     } catch (err) {
-      console.error('Error signing out:', err);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error signing out:', err);
+      }
     }
   };
 
@@ -219,7 +233,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       return !!data;
     } catch (err) {
-      console.error('Error making user admin:', err);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error making user admin:', err);
+      }
       return false;
     }
   };
@@ -237,7 +253,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       return !!data;
     } catch (err) {
-      console.error('Error removing user admin:', err);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error removing user admin:', err);
+      }
       return false;
     }
   };

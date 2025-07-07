@@ -313,9 +313,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
   const { signIn, signUp, availableUsernames, selectedUsername, setSelectedUsername, fetchUsernames } = useAuth();
   const router = useRouter();
 
-  // Debug logging
-  console.log('AuthModal - Available usernames:', availableUsernames);
-  console.log('AuthModal - Selected username:', selectedUsername);
+  // Debug logging removed for production
 
   // Fetch usernames when modal opens
   useEffect(() => {
@@ -343,7 +341,9 @@ export default function AuthModal({ onClose }: AuthModalProps) {
         onClose();
       }
     } catch (err) {
-      console.error('Sign in error:', err);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Sign in error:', err);
+      }
       setError('An unexpected error occurred');
     } finally {
       setLoading(false);
@@ -372,7 +372,9 @@ export default function AuthModal({ onClose }: AuthModalProps) {
         onClose();
       }
     } catch (err) {
-      console.error('Sign up error:', err);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Sign up error:', err);
+      }
       setError('An unexpected error occurred');
     } finally {
       setLoading(false);
