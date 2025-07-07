@@ -313,126 +313,201 @@ About snakes.`}
           {loading && <div style={{ color: '#4ade80', fontWeight: 'bold', marginTop: 16 }}>Loading tape...</div>}
           {error && <div style={{ color: '#f87171', fontWeight: 'bold', marginTop: 16 }}>{error}</div>}
           <audio ref={audioRef} src={audioUrl || undefined} style={{ display: 'none' }} />
-          {/* Progress Bar & Controls */}
-          <div style={{ width: 420, marginTop: 32, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            {/* Progress Bar */}
+          {/* Modern Audio Player */}
+          <div style={{ 
+            width: 450, 
+            marginTop: 32, 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center',
+            background: 'rgba(0, 0, 0, 0.8)',
+            backdropFilter: 'blur(20px)',
+            borderRadius: '24px',
+            padding: '24px 32px',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+          }}>
+            {/* Track Title */}
+            <div style={{
+              color: '#fff',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              marginBottom: '20px',
+              textAlign: 'center',
+              letterSpacing: '0.5px',
+              textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
+            }}>
+              Big Big Mammals
+            </div>
+
+            {/* Progress Bar Container */}
             <div
               style={{
                 width: '100%',
-                height: 28,
-                background: '#fff',
-                borderRadius: 6,
-                border: '1.5px solid #222',
+                height: '8px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                borderRadius: '50px',
                 position: 'relative',
-                marginBottom: 8,
-                overflow: 'visible',
-                display: 'flex',
-                alignItems: 'center',
+                marginBottom: '20px',
                 cursor: duration > 0 ? 'pointer' : 'default',
+                boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.3)',
+                overflow: 'hidden'
               }}
               onClick={duration > 0 ? handleSeek : undefined}
             >
-              {/* Progress Fill */}
+              {/* Progress Fill with Gradient */}
               <div
                 style={{
                   position: 'absolute',
-                  left: 40,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  width: duration > 0 ? `calc(${(currentTime / duration) * 100}% - 40px)` : 0,
-                  height: 6,
-                  background: '#111',
-                  borderRadius: 3,
-                  zIndex: 2,
-                  transition: 'width 0.2s',
+                  left: 0,
+                  top: 0,
+                  width: duration > 0 ? `${(currentTime / duration) * 100}%` : '0%',
+                  height: '100%',
+                  background: 'linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3)',
+                  borderRadius: '50px',
+                  transition: 'width 0.3s ease',
+                  boxShadow: '0 0 20px rgba(255, 107, 107, 0.5)',
                 }}
               />
-              {/* Bar background */}
-              <div
-                style={{
-                  position: 'absolute',
-                  left: 40,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  width: 'calc(100% - 100px)',
-                  height: 6,
-                  background: '#e5e5e5',
-                  borderRadius: 3,
-                  zIndex: 1,
-                }}
-              />
-              {/* Knob */}
-              {duration > 0 && (
+              
+              {/* Animated Progress Glow */}
+              {isPlaying && (
                 <div
                   style={{
                     position: 'absolute',
-                    left: `calc(40px + ${(currentTime / duration) * (420 - 100)}px - 10px)` ,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    width: 20,
-                    height: 20,
-                    background: '#fff',
-                    border: '2px solid #111',
+                    left: duration > 0 ? `${(currentTime / duration) * 100}%` : '0%',
+                    top: '-2px',
+                    width: '12px',
+                    height: '12px',
+                    background: 'radial-gradient(circle, #fff 0%, #ff6b6b 100%)',
                     borderRadius: '50%',
-                    zIndex: 3,
-                    pointerEvents: 'none',
+                    transform: 'translateX(-50%)',
+                    boxShadow: '0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 107, 107, 0.6)',
+                    animation: 'pulse 2s infinite',
                   }}
                 />
               )}
-              {/* Play/Stop Button */}
+            </div>
+
+            {/* Controls Row */}
+            <div style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              {/* Time Display Left */}
+              <span style={{
+                color: 'rgba(255, 255, 255, 0.8)',
+                fontFamily: digitalFont,
+                fontSize: '14px',
+                letterSpacing: '1px',
+                minWidth: '45px'
+              }}>
+                {formatTime(currentTime)}
+              </span>
+
+              {/* Play/Pause Button */}
               <button
                 onClick={handlePlayPause}
                 style={{
-                  position: 'absolute',
-                  left: 4,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: '#fff',
-                  border: '2px solid #111',
+                  background: isPlaying 
+                    ? 'linear-gradient(145deg, #ff6b6b, #ff5252)' 
+                    : 'linear-gradient(145deg, #48dbfb, #0abde3)',
+                  border: 'none',
                   borderRadius: '50%',
-                  width: 28,
-                  height: 28,
+                  width: '56px',
+                  height: '56px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: duration > 0 ? 'pointer' : 'not-allowed',
-                  zIndex: 4,
                   outline: 'none',
-                  padding: 0,
+                  transition: 'all 0.3s ease',
+                  boxShadow: isPlaying 
+                    ? '0 8px 25px rgba(255, 107, 107, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)' 
+                    : '0 8px 25px rgba(72, 219, 251, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+                  opacity: duration > 0 ? 1 : 0.5,
+                  transform: 'scale(1)',
                 }}
                 disabled={duration === 0}
-                aria-label={isPlaying ? 'Stop' : 'Play'}
-              >
-                {isPlaying ? (
-                  // Stop icon
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="6" y="6" width="12" height="12" rx="2" fill="#111"/></svg>
-                ) : (
-                  // Play icon
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><polygon points="7,5 21,12 7,19" fill="#111"/></svg>
-                )}
-              </button>
-              {/* Time Display */}
-              <span
-                style={{
-                  position: 'absolute',
-                  right: 16,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: '#111',
-                  fontFamily: digitalFont,
-                  fontSize: 18,
-                  letterSpacing: 1,
-                  zIndex: 5,
-                  userSelect: 'none',
-                  background: '#fff',
-                  padding: '0 6px',
-                  borderRadius: 4,
-                  border: '1px solid #ccc',
+                aria-label={isPlaying ? 'Pause' : 'Play'}
+                onMouseDown={(e) => {
+                  e.currentTarget.style.transform = 'scale(0.95)';
+                }}
+                onMouseUp={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
                 }}
               >
-                {formatTime(currentTime)}
+                {isPlaying ? (
+                  // Pause icon
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <rect x="7" y="5" width="3" height="14" rx="1" fill="#fff"/>
+                    <rect x="14" y="5" width="3" height="14" rx="1" fill="#fff"/>
+                  </svg>
+                ) : (
+                  // Play icon
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ marginLeft: '2px' }}>
+                    <polygon points="8,5 19,12 8,19" fill="#fff"/>
+                  </svg>
+                )}
+              </button>
+
+              {/* Duration Display Right */}
+              <span style={{
+                color: 'rgba(255, 255, 255, 0.8)',
+                fontFamily: digitalFont,
+                fontSize: '14px',
+                letterSpacing: '1px',
+                minWidth: '45px',
+                textAlign: 'right'
+              }}>
+                {formatTime(duration)}
               </span>
             </div>
+
+            {/* Visualizer Bars (decorative) */}
+            {isPlaying && (
+              <div style={{
+                width: '100%',
+                height: '30px',
+                display: 'flex',
+                alignItems: 'end',
+                justifyContent: 'center',
+                gap: '2px',
+                marginTop: '16px',
+                opacity: 0.6
+              }}>
+                {Array.from({ length: 20 }, (_, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      width: '3px',
+                      height: `${Math.random() * 20 + 5}px`,
+                      background: `hsl(${(i * 18) % 360}, 70%, 60%)`,
+                      borderRadius: '2px',
+                      animation: `visualizer 0.${Math.floor(Math.random() * 5) + 5}s ease-in-out infinite alternate`,
+                      animationDelay: `${i * 0.1}s`
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* CSS Animations */}
+            <style>{`
+              @keyframes pulse {
+                0%, 100% { transform: translateX(-50%) scale(1); opacity: 1; }
+                50% { transform: translateX(-50%) scale(1.2); opacity: 0.8; }
+              }
+              @keyframes visualizer {
+                from { height: 5px; }
+                to { height: ${Math.random() * 25 + 10}px; }
+              }
+            `}</style>
           </div>
         </div>
       </section>

@@ -44,15 +44,6 @@
       "static/chunks/main-app-e138708f1cc5635d.js",
       "static/chunks/app/api/synology/upload/route-8b28c43b4e4f4143.js"
     ],
-    "/admin/page": [
-      "static/chunks/webpack-469ed5bf59376675.js",
-      "static/chunks/4bd1b696-39451bf46d4e88b0.js",
-      "static/chunks/684-2eb8cd21381c6230.js",
-      "static/chunks/main-app-e138708f1cc5635d.js",
-      "static/chunks/647-a77b83f133caaad7.js",
-      "static/chunks/997-41b550f42e59f952.js",
-      "static/chunks/app/admin/page-d149a180cf14aa89.js"
-    ],
     "/account/page": [
       "static/chunks/webpack-469ed5bf59376675.js",
       "static/chunks/4bd1b696-39451bf46d4e88b0.js",
@@ -68,7 +59,16 @@
       "static/chunks/684-2eb8cd21381c6230.js",
       "static/chunks/main-app-e138708f1cc5635d.js",
       "static/chunks/766-ee9b200c3ee9520d.js",
-      "static/chunks/app/page-377e5e9a5dc7e2a4.js"
+      "static/chunks/app/page-c94bee1ccf8cc9b7.js"
+    ],
+    "/admin/page": [
+      "static/chunks/webpack-469ed5bf59376675.js",
+      "static/chunks/4bd1b696-39451bf46d4e88b0.js",
+      "static/chunks/684-2eb8cd21381c6230.js",
+      "static/chunks/main-app-e138708f1cc5635d.js",
+      "static/chunks/647-a77b83f133caaad7.js",
+      "static/chunks/997-41b550f42e59f952.js",
+      "static/chunks/app/admin/page-d149a180cf14aa89.js"
     ],
     "/dent-dump/layout": [
       "static/chunks/webpack-469ed5bf59376675.js",
