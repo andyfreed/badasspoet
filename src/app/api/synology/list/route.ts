@@ -53,7 +53,11 @@ export async function GET() {
     }));
 
     const listData = await listResponse.json();
-    console.log('Full Synology listData:', JSON.stringify(listData, null, 2)); // DEBUG LOG
+    if (listData?.data?.files && listData.data.files.length > 0) {
+      console.log('First Synology file:', JSON.stringify(listData.data.files[0], null, 2));
+    } else {
+      console.log('No files found in Synology response:', JSON.stringify(listData, null, 2));
+    }
 
     // Step 3: Logout
     await fetch(`${synologyUrl}/webapi/auth.cgi`, {
@@ -102,4 +106,4 @@ export async function GET() {
     console.error('List files error:', error);
     return NextResponse.json({ error: 'Failed to list files' }, { status: 500 });
   }
-} 
+}
