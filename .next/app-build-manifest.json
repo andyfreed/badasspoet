@@ -14,7 +14,7 @@
       "static/chunks/main-app-e138708f1cc5635d.js",
       "static/css/4312f86ecc5e4bf9.css",
       "static/chunks/647-a77b83f133caaad7.js",
-      "static/chunks/app/layout-62ba622d304efbd1.js"
+      "static/chunks/app/layout-a4160739475f9b92.js"
     ],
     "/api/synology/delete/route": [
       "static/chunks/webpack-469ed5bf59376675.js",
@@ -51,7 +51,7 @@
       "static/chunks/main-app-e138708f1cc5635d.js",
       "static/chunks/647-a77b83f133caaad7.js",
       "static/chunks/997-41b550f42e59f952.js",
-      "static/chunks/app/admin/page-6c3f2804aa601e89.js"
+      "static/chunks/app/admin/page-d149a180cf14aa89.js"
     ],
     "/account/page": [
       "static/chunks/webpack-469ed5bf59376675.js",
@@ -60,7 +60,7 @@
       "static/chunks/main-app-e138708f1cc5635d.js",
       "static/chunks/647-a77b83f133caaad7.js",
       "static/chunks/997-41b550f42e59f952.js",
-      "static/chunks/app/account/page-8016bf82f6211098.js"
+      "static/chunks/app/account/page-e6b9a9de0177d9f3.js"
     ],
     "/page": [
       "static/chunks/webpack-469ed5bf59376675.js",

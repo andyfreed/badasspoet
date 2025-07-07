@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { Session, User } from '@supabase/supabase-js';
 
 type AuthContextType = {
@@ -34,6 +34,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Check if current user is admin
   const checkAdminStatus = async (userId: string) => {
+    if (!isSupabaseConfigured()) {
+      setIsAdmin(false);
+      return;
+    }
+    
     try {
       const { data, error } = await supabase.rpc('is_user_admin', { user_uuid: userId });
       if (!error && data !== null && data !== undefined) {
@@ -55,6 +60,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Setup auth state listener
     const setupAuthListener = async () => {
+      // Skip auth initialization if Supabase is not configured
+      if (!isSupabaseConfigured()) {
+        setLoading(false);
+        return;
+      }
+
       const { data } = await supabase.auth.getSession();
       setSession(data.session);
       setUser(data.session?.user || null);
@@ -96,6 +107,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Fetch available usernames
   const fetchUsernames = async () => {
+    if (!isSupabaseConfigured()) {
+      return;
+    }
+    
     try {
       const { data, error } = await supabase
         .from('usernames')
@@ -120,6 +135,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Sign up with email and password
   const signUp = async (email: string, password: string, username: string) => {
+    if (!isSupabaseConfigured()) {
+      return { error: new Error('Supabase configuration is missing'), data: null };
+    }
+    
     try {
       // First register the user with options to disable email verification
       const { data, error } = await supabase.auth.signUp({
@@ -194,6 +213,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Sign in with email and password
   const signIn = async (email: string, password: string) => {
+    if (!isSupabaseConfigured()) {
+      return { error: new Error('Supabase configuration is missing'), data: null };
+    }
+    
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -211,6 +234,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Sign out
   const signOut = async () => {
+    if (!isSupabaseConfigured()) {
+      return;
+    }
+    
     try {
       await supabase.auth.signOut();
     } catch (err) {
@@ -222,6 +249,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Make user admin
   const makeUserAdmin = async (targetUserId: string) => {
+    if (!isSupabaseConfigured()) {
+      return false;
+    }
+    
     try {
       if (!user) return false;
       const { data, error } = await supabase.rpc('make_user_admin', { 
@@ -242,6 +273,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Remove user admin
   const removeUserAdmin = async (targetUserId: string) => {
+    if (!isSupabaseConfigured()) {
+      return false;
+    }
+    
     try {
       if (!user) return false;
       const { data, error } = await supabase.rpc('remove_user_admin', { 
