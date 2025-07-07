@@ -48,11 +48,12 @@ export async function GET() {
       version: '2',
       method: 'list',
       folder_path: '/FREEDSHARED/dent-dump',
-      additional: 'time,size',
+      additional: 'real_path,size,owner,time,perm,type',
       _sid: sid
     }));
 
     const listData = await listResponse.json();
+    console.log('Full Synology listData:', JSON.stringify(listData, null, 2)); // DEBUG LOG
 
     // Step 3: Logout
     await fetch(`${synologyUrl}/webapi/auth.cgi`, {
