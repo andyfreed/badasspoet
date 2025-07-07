@@ -80,17 +80,20 @@ export async function GET() {
     // Filter only files (not folders) and format the response
     const files = listData.data.files
       .filter((entry: any) => !entry.isdir)
-      .map((entry: any) => ({
-        id: entry.name,
-        name: entry.name,
-        size: entry.additional?.size || entry.size || 0,
-        path: entry.path,
-        uploadDate: entry.additional?.time?.mtime 
-          ? new Date(entry.additional.time.mtime * 1000).toISOString()
-          : entry.time?.mtime
-          ? new Date(entry.time.mtime * 1000).toISOString()
-          : new Date().toISOString()
-      }));
+      .map((entry: any) => {
+        console.log('Synology file entry:', JSON.stringify(entry, null, 2)); // DEBUG LOG
+        return {
+          id: entry.name,
+          name: entry.name,
+          size: entry.additional?.size || entry.size || 0,
+          path: entry.path,
+          uploadDate: entry.additional?.time?.mtime 
+            ? new Date(entry.additional.time.mtime * 1000).toISOString()
+            : entry.time?.mtime
+            ? new Date(entry.time.mtime * 1000).toISOString()
+            : new Date().toISOString()
+        };
+      });
 
     return NextResponse.json({ files });
 
