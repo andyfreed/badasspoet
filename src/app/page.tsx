@@ -20,8 +20,7 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [currentLyric, setCurrentLyric] = useState("");
-  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
-  const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
+  const [lyricIndex, setLyricIndex] = useState(0);
 
   // All lyrics for Big Big Mammals
   const allLyrics = [
@@ -50,107 +49,43 @@ export default function Home() {
     "Ba-ba-ba-ba-ba-ba baleen!"
   ];
 
-  // AI-powered lyric sync using audio analysis
-  const setupAudioAnalysis = () => {
-    if (!audioRef.current) return;
+  // Super simple lyric system - just show them every 3 seconds
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
     
-    try {
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    if (isPlaying && audioUrl) {
+      console.log('🎵 Starting simple lyric timer');
+      setCurrentLyric(""); // Clear first
+      setLyricIndex(0);
       
-      // Resume context if suspended (required for autoplay policies)
-      if (ctx.state === 'suspended') {
-        ctx.resume();
-      }
+      // Show first lyric after 1 second
+      setTimeout(() => {
+        if (isPlaying) {
+          setCurrentLyric(allLyrics[0]);
+          setLyricIndex(1);
+        }
+      }, 1000);
       
-      const analyserNode = ctx.createAnalyser();
-      analyserNode.fftSize = 256;
-      
-      const source = ctx.createMediaElementSource(audioRef.current);
-      source.connect(analyserNode);
-      analyserNode.connect(ctx.destination);
-      
-      setAudioContext(ctx);
-      setAnalyser(analyserNode);
-      
-      console.log('🎵 Audio analysis setup complete');
-      
-      // Start analyzing audio for lyric timing
-      analyzeAudioForLyrics(analyserNode);
-    } catch (error) {
-      console.error('Audio analysis setup failed:', error);
-      // Fallback to simple timing
-      startSimpleLyricTiming();
+      // Then show new lyric every 3 seconds
+      interval = setInterval(() => {
+        setLyricIndex(prev => {
+          if (prev < allLyrics.length && isPlaying) {
+            setCurrentLyric(allLyrics[prev]);
+            console.log(`🎵 Showing lyric ${prev}: "${allLyrics[prev]}"`);
+            return prev + 1;
+          }
+          return prev;
+        });
+      }, 3000);
+    } else {
+      setCurrentLyric("");
+      setLyricIndex(0);
     }
-  };
-
-  // Simple fallback timing system
-  const startSimpleLyricTiming = () => {
-    console.log('🎵 Using simple lyric timing fallback');
-    let lyricIndex = 0;
     
-    const showNextLyric = () => {
-      if (!isPlaying || lyricIndex >= allLyrics.length) return;
-      
-      setCurrentLyric(allLyrics[lyricIndex]);
-      console.log(`🎵 Showing lyric ${lyricIndex}: "${allLyrics[lyricIndex]}"`);
-      lyricIndex++;
-      
-      // Show each lyric for ~3 seconds
-      setTimeout(showNextLyric, 3200);
+    return () => {
+      if (interval) clearInterval(interval);
     };
-    
-    // Start first lyric after 1 second
-    setTimeout(showNextLyric, 1000);
-  };
-
-  // Insane AI audio analysis for lyric sync
-  const analyzeAudioForLyrics = (analyserNode: AnalyserNode) => {
-    const bufferLength = analyserNode.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
-    let lyricIndex = 0;
-    let lastLyricTime = 0;
-    let energyHistory: number[] = [];
-    
-    console.log('🎵 Starting AI audio analysis...');
-    
-    const analyze = () => {
-      if (!isPlaying) {
-        requestAnimationFrame(analyze);
-        return;
-      }
-      
-      analyserNode.getByteFrequencyData(dataArray);
-      
-      // Calculate audio energy
-      const avgEnergy = dataArray.reduce((sum, val) => sum + val, 0) / bufferLength;
-      energyHistory.push(avgEnergy);
-      if (energyHistory.length > 20) energyHistory.shift();
-      
-      const currentTime = audioRef.current?.currentTime || 0;
-      const timeSinceLastLyric = currentTime - lastLyricTime;
-      
-      // Simple but effective: advance lyric every 3-4 seconds with some energy-based variation
-      const baseInterval = 3.2;
-      const energyVariation = avgEnergy > 100 ? 0.8 : 1.2; // Speed up on high energy
-      const interval = baseInterval * energyVariation;
-      
-      if (timeSinceLastLyric > interval && lyricIndex < allLyrics.length) {
-        setCurrentLyric(allLyrics[lyricIndex]);
-        console.log(`🎵 AI showing lyric ${lyricIndex}: "${allLyrics[lyricIndex]}" (energy: ${avgEnergy.toFixed(1)})`);
-        lyricIndex++;
-        lastLyricTime = currentTime;
-      }
-      
-      // Clear lyrics occasionally during low energy (instrumental breaks)
-      if (avgEnergy < 50 && Math.random() < 0.05) {
-        setCurrentLyric("");
-      }
-      
-      requestAnimationFrame(analyze);
-    };
-    
-    analyze();
-  };
+  }, [isPlaying, audioUrl]);
 
   // Helper to check if a file is audio
   const isAudioFile = (name: string) => /\.(mp3|wav|ogg)$/i.test(name);
@@ -194,18 +129,14 @@ export default function Home() {
     
     const onPlay = () => {
       setIsPlaying(true);
-      setCurrentLyric("");
       console.log('🎵 Audio started playing');
-      setupAudioAnalysis();
     };
     const onPause = () => {
       setIsPlaying(false);
-      setCurrentLyric("");
       console.log('🎵 Audio paused');
     };
     const onEnded = () => {
       setIsPlaying(false);
-      setCurrentLyric("");
       console.log('🎵 Audio ended');
     };
     const onTimeUpdate = () => setCurrentTime(audio.currentTime);
@@ -460,25 +391,24 @@ About snakes.`}
           `}</style>
 
           {/* Debug info */}
-          {isPlaying && (
-            <div style={{
-              position: 'fixed',
-              top: '20px',
-              right: '20px',
-              background: 'rgba(0,0,0,0.8)',
-              color: '#00ff00',
-              fontFamily: 'monospace',
-              fontSize: '12px',
-              padding: '10px',
-              borderRadius: '4px',
-              zIndex: 999
-            }}>
-              Playing: {isPlaying ? 'YES' : 'NO'}<br/>
-              Audio URL: {audioUrl ? 'YES' : 'NO'}<br/>
-              Current Lyric: "{currentLyric}"<br/>
-              Time: {currentTime.toFixed(1)}s
-            </div>
-          )}
+          <div style={{
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            background: 'rgba(0,0,0,0.8)',
+            color: '#00ff00',
+            fontFamily: 'monospace',
+            fontSize: '12px',
+            padding: '10px',
+            borderRadius: '4px',
+            zIndex: 999
+          }}>
+            Playing: {isPlaying ? 'YES' : 'NO'}<br/>
+            Audio URL: {audioUrl ? 'YES' : 'NO'}<br/>
+            Current Lyric: "{currentLyric}"<br/>
+            Lyric Index: {lyricIndex}<br/>
+            Time: {currentTime.toFixed(1)}s
+          </div>
 
           {/* AI-Synced Lyrics Display */}
           {isPlaying && audioUrl && currentLyric && (
