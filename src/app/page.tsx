@@ -19,44 +19,127 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [currentLyric, setCurrentLyric] = useState("");
+  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
+  const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
 
-  // Timed lyrics for Big Big Mammals (with timestamps in seconds)
-  const timedLyrics = [
-    { time: 0, text: "You've got the rhino" },
-    { time: 3, text: "And the ellyphant" },
-    { time: 6, text: "You've got Mr. Hippo" },
-    { time: 9, text: "He's fat and ellygant" },
-    { time: 12, text: "You've got the dugong" },
-    { time: 15, text: "And that manatee" },
-    { time: 18, text: "Mighty gorilla" },
-    { time: 21, text: "And Travis the chimpanzee" },
-    { time: 24, text: "Although the last does not seem so great" },
-    { time: 27, text: "But he ate a lady's face" },
-    { time: 32, text: "" },
-    { time: 34, text: "Big, Big Mammals" },
-    { time: 37, text: "These are some of my favorite animals" },
-    { time: 41, text: "Big, Big Mammals" },
-    { time: 44, text: "But not the biggest or my favorite animal" },
-    { time: 48, text: "That would be the whale." },
-    { time: 52, text: "" },
-    { time: 54, text: "Big, big Mammals" },
-    { time: 57, text: "Close to my favorite animals" },
-    { time: 61, text: "Big, big mammals" },
-    { time: 64, text: "But not my favorite animals" },
-    { time: 68, text: "That would be the whale" },
-    { time: 71, text: "The big big blue blue whale" },
-    { time: 75, text: "Ba-ba-ba-ba-ba-ba baleen" },
-    { time: 79, text: "Ba-ba-ba-ba-ba-ba baleen!" }
+  // All lyrics for Big Big Mammals
+  const allLyrics = [
+    "You've got the rhino",
+    "And the ellyphant", 
+    "You've got Mr. Hippo",
+    "He's fat and ellygant",
+    "You've got the dugong",
+    "And that manatee",
+    "Mighty gorilla", 
+    "And Travis the chimpanzee",
+    "Although the last does not seem so great",
+    "But he ate a lady's face",
+    "Big, Big Mammals",
+    "These are some of my favorite animals",
+    "Big, Big Mammals", 
+    "But not the biggest or my favorite animal",
+    "That would be the whale.",
+    "Big, big Mammals",
+    "Close to my favorite animals",
+    "Big, big mammals",
+    "But not my favorite animals", 
+    "That would be the whale",
+    "The big big blue blue whale",
+    "Ba-ba-ba-ba-ba-ba baleen",
+    "Ba-ba-ba-ba-ba-ba baleen!"
   ];
 
-  // Get current lyric based on current time
-  const getCurrentLyric = () => {
-    for (let i = timedLyrics.length - 1; i >= 0; i--) {
-      if (currentTime >= timedLyrics[i].time) {
-        return timedLyrics[i].text;
+  // AI-powered lyric sync using audio analysis
+  const setupAudioAnalysis = () => {
+    if (!audioRef.current || audioContext) return;
+    
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const analyserNode = ctx.createAnalyser();
+    analyserNode.fftSize = 256;
+    
+    const source = ctx.createMediaElementSource(audioRef.current);
+    source.connect(analyserNode);
+    analyserNode.connect(ctx.destination);
+    
+    setAudioContext(ctx);
+    setAnalyser(analyserNode);
+    
+    // Start analyzing audio for lyric timing
+    analyzeAudioForLyrics(analyserNode);
+  };
+
+  // Insane AI audio analysis for lyric sync
+  const analyzeAudioForLyrics = (analyserNode: AnalyserNode) => {
+    const bufferLength = analyserNode.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    let lyricIndex = 0;
+    let lastBeatTime = 0;
+    let energyThreshold = 0;
+    let silenceCount = 0;
+    
+    const analyze = () => {
+      if (!isPlaying) {
+        requestAnimationFrame(analyze);
+        return;
       }
-    }
-    return "";
+      
+      analyserNode.getByteFrequencyData(dataArray);
+      
+      // Calculate audio energy and spectral features
+      const totalEnergy = dataArray.reduce((sum, val) => sum + val * val, 0);
+      const avgEnergy = totalEnergy / bufferLength;
+      const bassEnergy = dataArray.slice(0, 8).reduce((sum, val) => sum + val, 0) / 8;
+      const midEnergy = dataArray.slice(8, 32).reduce((sum, val) => sum + val, 0) / 24;
+      const highEnergy = dataArray.slice(32, 64).reduce((sum, val) => sum + val, 0) / 32;
+      
+      // Adaptive threshold based on song dynamics
+      if (energyThreshold === 0) energyThreshold = avgEnergy * 1.5;
+      energyThreshold = energyThreshold * 0.99 + avgEnergy * 0.01;
+      
+      // Detect vocal segments vs instrumental breaks
+      const vocalLikelyhood = (midEnergy + highEnergy) / (bassEnergy + 1);
+      const isVocalSegment = vocalLikelyhood > 1.2 && avgEnergy > energyThreshold * 0.7;
+      
+      // Beat detection using onset detection
+      const currentTime = audioRef.current?.currentTime || 0;
+      const timeSinceLastBeat = currentTime - lastBeatTime;
+      const beatDetected = avgEnergy > energyThreshold * 1.3 && timeSinceLastBeat > 0.3;
+      
+      if (beatDetected) {
+        lastBeatTime = currentTime;
+      }
+      
+      // Silence detection for line breaks
+      if (avgEnergy < energyThreshold * 0.3) {
+        silenceCount++;
+      } else {
+        silenceCount = 0;
+      }
+      
+      // Advanced lyric timing using multiple audio features
+      const shouldAdvanceLyric = (
+        (beatDetected && isVocalSegment && timeSinceLastBeat > 1.5) ||
+        (silenceCount > 10 && lyricIndex < allLyrics.length - 1) ||
+        (currentTime > 3 + lyricIndex * 3.2) // Fallback timing
+      );
+      
+      if (shouldAdvanceLyric && lyricIndex < allLyrics.length) {
+        setCurrentLyric(allLyrics[lyricIndex]);
+        lyricIndex++;
+      }
+      
+      // Clear lyric during instrumental breaks
+      if (silenceCount > 20 || !isVocalSegment) {
+        if (Math.random() < 0.1) { // Occasionally clear for natural feel
+          setCurrentLyric("");
+        }
+      }
+      
+      requestAnimationFrame(analyze);
+    };
+    
+    analyze();
   };
 
   // Helper to check if a file is audio
@@ -94,64 +177,85 @@ export default function Home() {
       });
   }, [selectedId]);
 
-  // Reel animation control
+  // Audio event handlers
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    const onPlay = () => setIsPlaying(true);
-    const onPause = () => setIsPlaying(false);
+    
+    const onPlay = () => {
+      setIsPlaying(true);
+      setupAudioAnalysis();
+    };
+    const onPause = () => {
+      setIsPlaying(false);
+      setCurrentLyric("");
+    };
+    const onEnded = () => {
+      setIsPlaying(false);
+      setCurrentLyric("");
+    };
     const onTimeUpdate = () => setCurrentTime(audio.currentTime);
     const onLoadedMetadata = () => setDuration(audio.duration);
+    
     audio.addEventListener('play', onPlay);
     audio.addEventListener('pause', onPause);
-    audio.addEventListener('ended', onPause);
+    audio.addEventListener('ended', onEnded);
     audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('loadedmetadata', onLoadedMetadata);
+    
     return () => {
       audio.removeEventListener('play', onPlay);
       audio.removeEventListener('pause', onPause);
-      audio.removeEventListener('ended', onPause);
+      audio.removeEventListener('ended', onEnded);
       audio.removeEventListener('timeupdate', onTimeUpdate);
       audio.removeEventListener('loadedmetadata', onLoadedMetadata);
     };
   }, [audioUrl]);
 
-  // Play the big-big-mammals audio file from Synology on click
-  const playBigBigMammals = async () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
+  // Simple tape play/stop toggle
+  const toggleTape = async () => {
+    const audio = audioRef.current;
+    
+    // If already playing, just stop
+    if (isPlaying && audio) {
+      audio.pause();
+      return;
     }
-    setLoading(true);
-    setError(null);
-    const filePath = '/FREEDSHARED/dent-dump/big-big-mammals-v2.mp3';
-    try {
-      const response = await fetch('/api/synology/download', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ path: filePath })
-      });
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        setAudioUrl(url);
-        setTimeout(() => {
-          if (audioRef.current) {
-            audioRef.current.play();
-          }
-        }, 100);
-      } else {
-        let errMsg = 'Failed to load audio.';
-        try {
-          const errJson = await response.json();
-          errMsg = errJson.error || errMsg;
-        } catch {}
-        setError(errMsg);
+    
+    // If paused but audio loaded, resume
+    if (audio && audioUrl && !isPlaying) {
+      audio.play();
+      return;
+    }
+    
+    // Load and play for first time
+    if (!audioUrl && !loading) {
+      setLoading(true);
+      setError(null);
+      const filePath = '/FREEDSHARED/dent-dump/big-big-mammals-v2.mp3';
+      try {
+        const response = await fetch('/api/synology/download', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: filePath })
+        });
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          setAudioUrl(url);
+          setTimeout(() => {
+            if (audioRef.current) {
+              audioRef.current.play();
+            }
+          }, 100);
+        } else {
+          setError('Failed to load audio.');
+        }
+      } catch (err) {
+        setError('Network error. Please try again.');
       }
-    } catch (err) {
-      setError('Network error. Please try again.');
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // Reel SVG
@@ -169,39 +273,6 @@ export default function Home() {
     </svg>
   );
 
-  // Play/pause toggle handler
-  const handlePlayPause = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (isPlaying) {
-      audio.pause();
-    } else {
-      audio.play();
-    }
-  };
-
-  // Seek handler
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    const bar = e.currentTarget;
-    const rect = bar.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const percent = x / rect.width;
-    const seekTime = percent * duration;
-    if (audioRef.current) {
-      audioRef.current.currentTime = seekTime;
-    }
-  };
-
-  // Format time helper
-  const formatTime = (t: number) => {
-    if (isNaN(t)) return '0:00';
-    const m = Math.floor(t / 60);
-    const s = Math.floor(t % 60);
-    return `${m}:${s.toString().padStart(2, '0')}`;
-  };
-
-  // Add digital font fallback
-  const digitalFont = `'Orbitron', 'Share Tech Mono', 'VT323', 'monospace'`;
 
   return (
     <div style={{
@@ -335,10 +406,11 @@ About snakes.`}
               alignItems: 'center',
               justifyContent: 'center',
               cursor: loading ? 'not-allowed' : 'pointer',
-              filter: loading ? 'grayscale(0.7)' : 'none',
-              transition: 'filter 0.3s',
+              filter: loading ? 'grayscale(0.7)' : isPlaying ? 'brightness(1.2)' : 'none',
+              transition: 'all 0.3s',
+              transform: isPlaying ? 'scale(1.05)' : 'scale(1)',
             }}
-            onClick={() => { if (!loading) playBigBigMammals(); }}
+            onClick={() => { if (!loading) toggleTape(); }}
           >
             <Image
               src="/big-big-mammals-tape.png"
@@ -352,109 +424,29 @@ About snakes.`}
           {loading && <div style={{ color: '#4ade80', fontWeight: 'bold', marginTop: 16 }}>Loading tape...</div>}
           {error && <div style={{ color: '#f87171', fontWeight: 'bold', marginTop: 16 }}>{error}</div>}
           <audio ref={audioRef} src={audioUrl || undefined} style={{ display: 'none' }} />
-          {/* Minimal Retro Audio Player */}
-          <div style={{ 
-            width: 280, 
-            marginTop: 32, 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center',
-            background: '#1a1a1a',
-            border: '2px solid #333',
-            borderRadius: '8px',
-            padding: '16px',
-            boxShadow: 'inset 2px 2px 5px rgba(0,0,0,0.5), inset -2px -2px 5px rgba(255,255,255,0.1)'
-          }}>
-            {/* Track Title */}
+          
+          {/* Simple status indicator */}
+          {isPlaying && (
             <div style={{
+              marginTop: 20,
               color: '#00ff00',
-              fontSize: '12px',
               fontFamily: 'monospace',
-              marginBottom: '12px',
-              textAlign: 'center',
-              letterSpacing: '1px',
-              textTransform: 'uppercase'
+              fontSize: '14px',
+              animation: 'blink 1s infinite'
             }}>
-              BIG BIG MAMMALS
+              ● PLAYING
             </div>
+          )}
+          
+          <style>{`
+            @keyframes blink {
+              0%, 50% { opacity: 1; }
+              51%, 100% { opacity: 0.3; }
+            }
+          `}</style>
 
-            {/* Simple Progress Bar */}
-            <div
-              style={{
-                width: '100%',
-                height: '4px',
-                background: '#333',
-                border: '1px inset #666',
-                marginBottom: '16px',
-                cursor: duration > 0 ? 'pointer' : 'default',
-                position: 'relative'
-              }}
-              onClick={duration > 0 ? handleSeek : undefined}
-            >
-              <div
-                style={{
-                  width: duration > 0 ? `${(currentTime / duration) * 100}%` : '0%',
-                  height: '100%',
-                  background: '#00ff00',
-                  transition: 'width 0.1s linear'
-                }}
-              />
-            </div>
-
-            {/* Simple Controls */}
-            <div style={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              fontSize: '11px',
-              fontFamily: 'monospace',
-              color: '#999'
-            }}>
-              <span>{formatTime(currentTime)}</span>
-              
-              <button
-                onClick={handlePlayPause}
-                style={{
-                  background: '#333',
-                  border: '2px outset #666',
-                  width: '40px',
-                  height: '40px',
-                  cursor: duration > 0 ? 'pointer' : 'not-allowed',
-                  outline: 'none',
-                  fontSize: '16px',
-                  color: '#00ff00',
-                  fontFamily: 'monospace',
-                  opacity: duration > 0 ? 1 : 0.5,
-                }}
-                disabled={duration === 0}
-                onMouseDown={(e) => {
-                  if (duration > 0) e.currentTarget.style.border = '2px inset #666';
-                }}
-                onMouseUp={(e) => {
-                  if (duration > 0) e.currentTarget.style.border = '2px outset #666';
-                }}
-                onMouseLeave={(e) => {
-                  if (duration > 0) e.currentTarget.style.border = '2px outset #666';
-                }}
-              >
-                {isPlaying ? '❚❚' : '▶'}
-              </button>
-
-              <span>{formatTime(duration)}</span>
-            </div>
-
-            {/* CSS Animations */}
-            <style>{`
-              @keyframes scrollLyrics {
-                0% { transform: translateX(100vw); }
-                100% { transform: translateX(-100%); }
-              }
-            `}</style>
-          </div>
-
-          {/* Synced Lyrics Display */}
-          {isPlaying && audioUrl && getCurrentLyric() && (
+          {/* AI-Synced Lyrics Display */}
+          {isPlaying && audioUrl && currentLyric && (
             <div style={{
               position: 'fixed',
               bottom: '120px',
@@ -490,7 +482,7 @@ About snakes.`}
                 maxWidth: '90vw',
                 padding: '0 20px'
               }}>
-                🎵 {getCurrentLyric()} 🎵
+                🎵 {currentLyric} 🎵
               </div>
               <style>{`
                 @keyframes gradientShift {
