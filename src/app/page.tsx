@@ -52,21 +52,55 @@ export default function Home() {
 
   // AI-powered lyric sync using audio analysis
   const setupAudioAnalysis = () => {
-    if (!audioRef.current || audioContext) return;
+    if (!audioRef.current) return;
     
-    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const analyserNode = ctx.createAnalyser();
-    analyserNode.fftSize = 256;
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      
+      // Resume context if suspended (required for autoplay policies)
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
+      
+      const analyserNode = ctx.createAnalyser();
+      analyserNode.fftSize = 256;
+      
+      const source = ctx.createMediaElementSource(audioRef.current);
+      source.connect(analyserNode);
+      analyserNode.connect(ctx.destination);
+      
+      setAudioContext(ctx);
+      setAnalyser(analyserNode);
+      
+      console.log('🎵 Audio analysis setup complete');
+      
+      // Start analyzing audio for lyric timing
+      analyzeAudioForLyrics(analyserNode);
+    } catch (error) {
+      console.error('Audio analysis setup failed:', error);
+      // Fallback to simple timing
+      startSimpleLyricTiming();
+    }
+  };
+
+  // Simple fallback timing system
+  const startSimpleLyricTiming = () => {
+    console.log('🎵 Using simple lyric timing fallback');
+    let lyricIndex = 0;
     
-    const source = ctx.createMediaElementSource(audioRef.current);
-    source.connect(analyserNode);
-    analyserNode.connect(ctx.destination);
+    const showNextLyric = () => {
+      if (!isPlaying || lyricIndex >= allLyrics.length) return;
+      
+      setCurrentLyric(allLyrics[lyricIndex]);
+      console.log(`🎵 Showing lyric ${lyricIndex}: "${allLyrics[lyricIndex]}"`);
+      lyricIndex++;
+      
+      // Show each lyric for ~3 seconds
+      setTimeout(showNextLyric, 3200);
+    };
     
-    setAudioContext(ctx);
-    setAnalyser(analyserNode);
-    
-    // Start analyzing audio for lyric timing
-    analyzeAudioForLyrics(analyserNode);
+    // Start first lyric after 1 second
+    setTimeout(showNextLyric, 1000);
   };
 
   // Insane AI audio analysis for lyric sync
@@ -74,9 +108,10 @@ export default function Home() {
     const bufferLength = analyserNode.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
     let lyricIndex = 0;
-    let lastBeatTime = 0;
-    let energyThreshold = 0;
-    let silenceCount = 0;
+    let lastLyricTime = 0;
+    let energyHistory: number[] = [];
+    
+    console.log('🎵 Starting AI audio analysis...');
     
     const analyze = () => {
       if (!isPlaying) {
@@ -86,54 +121,29 @@ export default function Home() {
       
       analyserNode.getByteFrequencyData(dataArray);
       
-      // Calculate audio energy and spectral features
-      const totalEnergy = dataArray.reduce((sum, val) => sum + val * val, 0);
-      const avgEnergy = totalEnergy / bufferLength;
-      const bassEnergy = dataArray.slice(0, 8).reduce((sum, val) => sum + val, 0) / 8;
-      const midEnergy = dataArray.slice(8, 32).reduce((sum, val) => sum + val, 0) / 24;
-      const highEnergy = dataArray.slice(32, 64).reduce((sum, val) => sum + val, 0) / 32;
+      // Calculate audio energy
+      const avgEnergy = dataArray.reduce((sum, val) => sum + val, 0) / bufferLength;
+      energyHistory.push(avgEnergy);
+      if (energyHistory.length > 20) energyHistory.shift();
       
-      // Adaptive threshold based on song dynamics
-      if (energyThreshold === 0) energyThreshold = avgEnergy * 1.5;
-      energyThreshold = energyThreshold * 0.99 + avgEnergy * 0.01;
-      
-      // Detect vocal segments vs instrumental breaks
-      const vocalLikelyhood = (midEnergy + highEnergy) / (bassEnergy + 1);
-      const isVocalSegment = vocalLikelyhood > 1.2 && avgEnergy > energyThreshold * 0.7;
-      
-      // Beat detection using onset detection
       const currentTime = audioRef.current?.currentTime || 0;
-      const timeSinceLastBeat = currentTime - lastBeatTime;
-      const beatDetected = avgEnergy > energyThreshold * 1.3 && timeSinceLastBeat > 0.3;
+      const timeSinceLastLyric = currentTime - lastLyricTime;
       
-      if (beatDetected) {
-        lastBeatTime = currentTime;
-      }
+      // Simple but effective: advance lyric every 3-4 seconds with some energy-based variation
+      const baseInterval = 3.2;
+      const energyVariation = avgEnergy > 100 ? 0.8 : 1.2; // Speed up on high energy
+      const interval = baseInterval * energyVariation;
       
-      // Silence detection for line breaks
-      if (avgEnergy < energyThreshold * 0.3) {
-        silenceCount++;
-      } else {
-        silenceCount = 0;
-      }
-      
-      // Advanced lyric timing using multiple audio features
-      const shouldAdvanceLyric = (
-        (beatDetected && isVocalSegment && timeSinceLastBeat > 1.5) ||
-        (silenceCount > 10 && lyricIndex < allLyrics.length - 1) ||
-        (currentTime > 3 + lyricIndex * 3.2) // Fallback timing
-      );
-      
-      if (shouldAdvanceLyric && lyricIndex < allLyrics.length) {
+      if (timeSinceLastLyric > interval && lyricIndex < allLyrics.length) {
         setCurrentLyric(allLyrics[lyricIndex]);
+        console.log(`🎵 AI showing lyric ${lyricIndex}: "${allLyrics[lyricIndex]}" (energy: ${avgEnergy.toFixed(1)})`);
         lyricIndex++;
+        lastLyricTime = currentTime;
       }
       
-      // Clear lyric during instrumental breaks
-      if (silenceCount > 20 || !isVocalSegment) {
-        if (Math.random() < 0.1) { // Occasionally clear for natural feel
-          setCurrentLyric("");
-        }
+      // Clear lyrics occasionally during low energy (instrumental breaks)
+      if (avgEnergy < 50 && Math.random() < 0.05) {
+        setCurrentLyric("");
       }
       
       requestAnimationFrame(analyze);
@@ -184,15 +194,19 @@ export default function Home() {
     
     const onPlay = () => {
       setIsPlaying(true);
+      setCurrentLyric("");
+      console.log('🎵 Audio started playing');
       setupAudioAnalysis();
     };
     const onPause = () => {
       setIsPlaying(false);
       setCurrentLyric("");
+      console.log('🎵 Audio paused');
     };
     const onEnded = () => {
       setIsPlaying(false);
       setCurrentLyric("");
+      console.log('🎵 Audio ended');
     };
     const onTimeUpdate = () => setCurrentTime(audio.currentTime);
     const onLoadedMetadata = () => setDuration(audio.duration);
@@ -444,6 +458,27 @@ About snakes.`}
               51%, 100% { opacity: 0.3; }
             }
           `}</style>
+
+          {/* Debug info */}
+          {isPlaying && (
+            <div style={{
+              position: 'fixed',
+              top: '20px',
+              right: '20px',
+              background: 'rgba(0,0,0,0.8)',
+              color: '#00ff00',
+              fontFamily: 'monospace',
+              fontSize: '12px',
+              padding: '10px',
+              borderRadius: '4px',
+              zIndex: 999
+            }}>
+              Playing: {isPlaying ? 'YES' : 'NO'}<br/>
+              Audio URL: {audioUrl ? 'YES' : 'NO'}<br/>
+              Current Lyric: "{currentLyric}"<br/>
+              Time: {currentTime.toFixed(1)}s
+            </div>
+          )}
 
           {/* AI-Synced Lyrics Display */}
           {isPlaying && audioUrl && currentLyric && (
