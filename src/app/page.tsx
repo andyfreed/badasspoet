@@ -193,7 +193,7 @@ export default function Home() {
     if (!audioUrl2 && !loading2) {
       setLoading2(true);
       setError2(null);
-      const filePath = '/FREEDSHARED/dent-dump/whenipaintmymasterpiece.mp3';
+      const filePath = '/FREEDSHARED/dent-dump/DENT - When I paint my masterpiece_v03.m4a';
       try {
         const response = await fetch('/api/synology/download', {
           method: 'POST',
