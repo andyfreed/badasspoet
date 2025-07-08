@@ -19,73 +19,6 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [currentLyric, setCurrentLyric] = useState("");
-  const [lyricIndex, setLyricIndex] = useState(0);
-
-  // All lyrics for Big Big Mammals
-  const allLyrics = [
-    "You've got the rhino",
-    "And the ellyphant", 
-    "You've got Mr. Hippo",
-    "He's fat and ellygant",
-    "You've got the dugong",
-    "And that manatee",
-    "Mighty gorilla", 
-    "And Travis the chimpanzee",
-    "Although the last does not seem so great",
-    "But he ate a lady's face",
-    "Big, Big Mammals",
-    "These are some of my favorite animals",
-    "Big, Big Mammals", 
-    "But not the biggest or my favorite animal",
-    "That would be the whale.",
-    "Big, big Mammals",
-    "Close to my favorite animals",
-    "Big, big mammals",
-    "But not my favorite animals", 
-    "That would be the whale",
-    "The big big blue blue whale",
-    "Ba-ba-ba-ba-ba-ba baleen",
-    "Ba-ba-ba-ba-ba-ba baleen!"
-  ];
-
-  // Super simple lyric system - just show them every 3 seconds
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    
-    if (isPlaying && audioUrl) {
-      console.log('🎵 Starting simple lyric timer');
-      setCurrentLyric(""); // Clear first
-      setLyricIndex(0);
-      
-      // Show first lyric after 1 second
-      setTimeout(() => {
-        if (isPlaying) {
-          setCurrentLyric(allLyrics[0]);
-          setLyricIndex(1);
-        }
-      }, 1000);
-      
-      // Then show new lyric every 3 seconds
-      interval = setInterval(() => {
-        setLyricIndex(prev => {
-          if (prev < allLyrics.length && isPlaying) {
-            setCurrentLyric(allLyrics[prev]);
-            console.log(`🎵 Showing lyric ${prev}: "${allLyrics[prev]}"`);
-            return prev + 1;
-          }
-          return prev;
-        });
-      }, 3000);
-    } else {
-      setCurrentLyric("");
-      setLyricIndex(0);
-    }
-    
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isPlaying, audioUrl]);
 
   // Helper to check if a file is audio
   const isAudioFile = (name: string) => /\.(mp3|wav|ogg)$/i.test(name);
@@ -339,38 +272,57 @@ About snakes.`}
         alignItems: 'center',
         justifyContent: 'center',
       }}>
-        {/* Background lyrics text */}
-        {isPlaying && currentLyric && (
+        {/* All lyrics burned into background like old wood */}
+        <div style={{
+          position: 'absolute',
+          top: '10%',
+          left: '5%',
+          width: '90%',
+          height: '80%',
+          zIndex: 1,
+          pointerEvents: 'none',
+          overflow: 'hidden'
+        }}>
           <div style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1,
-            pointerEvents: 'none'
+            fontSize: '24px',
+            fontWeight: 'normal',
+            color: 'rgba(139, 69, 19, 0.15)', // Dark brown like burned wood
+            fontFamily: 'Courier New, monospace',
+            lineHeight: '1.6',
+            letterSpacing: '1px',
+            textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3), inset 1px 1px 1px rgba(0, 0, 0, 0.2)',
+            userSelect: 'none',
+            transform: 'rotate(-2deg)',
+            whiteSpace: 'pre-line',
+            filter: 'contrast(1.2) brightness(0.8)'
           }}>
-            <div style={{
-              fontSize: '120px',
-              fontWeight: 'bold',
-              color: 'rgba(255, 255, 255, 0.05)',
-              textAlign: 'center',
-              lineHeight: '1.1',
-              fontFamily: 'Arial, sans-serif',
-              letterSpacing: '2px',
-              textShadow: '0 0 20px rgba(255, 255, 255, 0.1)',
-              maxWidth: '90%',
-              wordWrap: 'break-word',
-              transform: 'rotate(-15deg)',
-              userSelect: 'none'
-            }}>
-              {currentLyric}
-            </div>
+            {`You've got the rhino
+And the ellyphant
+You've got Mr. Hippo
+He's fat and ellygant
+You've got the dugong
+And that manatee
+Mighty gorilla
+And Travis the chimpanzee
+Although the last does not seem so great
+But he ate a lady's face
+
+Big, Big Mammals
+These are some of my favorite animals
+Big, Big Mammals
+But not the biggest or my favorite animal
+That would be the whale.
+
+Big, big Mammals
+Close to my favorite animals
+Big, big mammals
+But not my favorite animals
+That would be the whale
+The big big blue blue whale
+Ba-ba-ba-ba-ba-ba baleen
+Ba-ba-ba-ba-ba-ba baleen!`}
           </div>
-        )}
+        </div>
         <div style={{
           display: 'flex',
           alignItems: 'center',
