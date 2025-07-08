@@ -20,6 +20,13 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
+  // Second tape state
+  const [isPlaying2, setIsPlaying2] = useState(false);
+  const [audioUrl2, setAudioUrl2] = useState<string | null>(null);
+  const [loading2, setLoading2] = useState(false);
+  const [error2, setError2] = useState<string | null>(null);
+  const audioRef2 = useRef<HTMLAudioElement>(null);
+
   // Helper to check if a file is audio
   const isAudioFile = (name: string) => /\.(mp3|wav|ogg)$/i.test(name);
 
@@ -90,6 +97,35 @@ export default function Home() {
     };
   }, [audioUrl]);
 
+  // Second tape audio event handlers
+  useEffect(() => {
+    const audio = audioRef2.current;
+    if (!audio) return;
+    
+    const onPlay = () => {
+      setIsPlaying2(true);
+      console.log('🎵 Second tape started playing');
+    };
+    const onPause = () => {
+      setIsPlaying2(false);
+      console.log('🎵 Second tape paused');
+    };
+    const onEnded = () => {
+      setIsPlaying2(false);
+      console.log('🎵 Second tape ended');
+    };
+    
+    audio.addEventListener('play', onPlay);
+    audio.addEventListener('pause', onPause);
+    audio.addEventListener('ended', onEnded);
+    
+    return () => {
+      audio.removeEventListener('play', onPlay);
+      audio.removeEventListener('pause', onPause);
+      audio.removeEventListener('ended', onEnded);
+    };
+  }, [audioUrl2]);
+
   // Simple tape play/stop toggle
   const toggleTape = async () => {
     const audio = audioRef.current;
@@ -133,6 +169,53 @@ export default function Home() {
         setError('Network error. Please try again.');
       }
       setLoading(false);
+    }
+  };
+
+  // Second tape toggle logic
+  const toggleTape2 = async () => {
+    const audio = audioRef2.current;
+    if (!audio) return;
+    
+    // If playing, pause
+    if (isPlaying2) {
+      audio.pause();
+      return;
+    }
+    
+    // If paused but audio loaded, resume
+    if (audio && audioUrl2 && !isPlaying2) {
+      audio.play();
+      return;
+    }
+    
+    // Load and play for first time
+    if (!audioUrl2 && !loading2) {
+      setLoading2(true);
+      setError2(null);
+      const filePath = '/FREEDSHARED/dent-dump/whenipaintmymasterpiece.mp3';
+      try {
+        const response = await fetch('/api/synology/download', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: filePath })
+        });
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          setAudioUrl2(url);
+          setTimeout(() => {
+            if (audioRef2.current) {
+              audioRef2.current.play();
+            }
+          }, 100);
+        } else {
+          setError2('Failed to load audio.');
+        }
+      } catch (err) {
+        setError2('Network error. Please try again.');
+      }
+      setLoading2(false);
     }
   };
 
@@ -331,43 +414,103 @@ Ba-ba-ba-ba-ba-ba baleen!`}
           position: 'relative',
           zIndex: 10
         }}>
-          <div
-            style={{
+          {/* Two tapes side by side */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '40px',
+            flexWrap: 'wrap'
+          }}>
+            {/* First tape */}
+            <div style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              filter: loading ? 'grayscale(0.7)' : isPlaying ? 'brightness(1.2)' : 'none',
-              transition: 'all 0.3s',
-              transform: isPlaying ? 'scale(1.05)' : 'scale(1)',
-            }}
-            onClick={() => { if (!loading) toggleTape(); }}
-          >
-            <Image
-              src="/big-big-mammals-tape.png"
-              alt="Big Big Mammals Tape"
-              width={340}
-              height={340}
-              style={{ borderRadius: 16, width: '100%', height: 'auto', maxWidth: 340 }}
-              priority
-            />
-          </div>
-          {loading && <div style={{ color: '#4ade80', fontWeight: 'bold', marginTop: 16 }}>Loading tape...</div>}
-          {error && <div style={{ color: '#f87171', fontWeight: 'bold', marginTop: 16 }}>{error}</div>}
-          <audio ref={audioRef} src={audioUrl || undefined} style={{ display: 'none' }} />
-          
-          {/* Simple status indicator */}
-          {isPlaying && (
-            <div style={{
-              marginTop: 20,
-              color: '#00ff00',
-              fontFamily: 'monospace',
-              fontSize: '14px',
-              animation: 'blink 1s infinite'
+              flexDirection: 'column',
             }}>
-              ● PLAYING
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  filter: loading ? 'grayscale(0.7)' : isPlaying ? 'brightness(1.2)' : 'none',
+                  transition: 'all 0.3s',
+                  transform: isPlaying ? 'scale(1.05)' : 'scale(1)',
+                }}
+                onClick={() => { if (!loading) toggleTape(); }}
+              >
+                <Image
+                  src="/big-big-mammals-tape.png"
+                  alt="Big Big Mammals Tape"
+                  width={280}
+                  height={280}
+                  style={{ borderRadius: 16, width: '100%', height: 'auto', maxWidth: 280 }}
+                  priority
+                />
+              </div>
+              {loading && <div style={{ color: '#4ade80', fontWeight: 'bold', marginTop: 12, fontSize: '12px' }}>Loading tape...</div>}
+              {error && <div style={{ color: '#f87171', fontWeight: 'bold', marginTop: 12, fontSize: '12px' }}>{error}</div>}
+              {isPlaying && (
+                <div style={{
+                  marginTop: 16,
+                  color: '#00ff00',
+                  fontFamily: 'monospace',
+                  fontSize: '12px',
+                  animation: 'blink 1s infinite'
+                }}>
+                  ● PLAYING
+                </div>
+              )}
             </div>
-          )}
+
+            {/* Second tape */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexDirection: 'column',
+            }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: loading2 ? 'not-allowed' : 'pointer',
+                  filter: loading2 ? 'grayscale(0.7)' : isPlaying2 ? 'brightness(1.2)' : 'none',
+                  transition: 'all 0.3s',
+                  transform: isPlaying2 ? 'scale(1.05)' : 'scale(1)',
+                }}
+                onClick={() => { if (!loading2) toggleTape2(); }}
+              >
+                <Image
+                  src="/whenipaintmymasterpiecetape.png"
+                  alt="When I Paint My Masterpiece Tape"
+                  width={280}
+                  height={280}
+                  style={{ borderRadius: 16, width: '100%', height: 'auto', maxWidth: 280 }}
+                  priority
+                />
+              </div>
+              {loading2 && <div style={{ color: '#4ade80', fontWeight: 'bold', marginTop: 12, fontSize: '12px' }}>Loading tape...</div>}
+              {error2 && <div style={{ color: '#f87171', fontWeight: 'bold', marginTop: 12, fontSize: '12px' }}>{error2}</div>}
+              {isPlaying2 && (
+                <div style={{
+                  marginTop: 16,
+                  color: '#00ff00',
+                  fontFamily: 'monospace',
+                  fontSize: '12px',
+                  animation: 'blink 1s infinite'
+                }}>
+                  ● PLAYING
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <audio ref={audioRef} src={audioUrl || undefined} style={{ display: 'none' }} />
+          <audio ref={audioRef2} src={audioUrl2 || undefined} style={{ display: 'none' }} />
           
           <style>{`
             @keyframes blink {
