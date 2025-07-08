@@ -20,6 +20,33 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
+  // Lyrics for Big Big Mammals
+  const bigBigMammalsLyrics = `You've got the rhino
+And the ellyphant
+You've got Mr. Hippo
+He's fat and ellygant
+You've got the dugong
+And that manatee
+Mighty gorilla
+And Travis the chimpanzee
+Although the last does not seem so great
+But he ate a lady's face
+
+Big, Big Mammals
+These are some of my favorite animals
+Big, Big Mammals
+But not the biggest or my favorite animal
+That would be the whale.
+
+Big, big Mammals
+Close to my favorite animals
+Big, big mammals
+But not my favorite animals
+That would be the whale
+The big big blue blue whale
+Ba-ba-ba-ba-ba-ba baleen
+Ba-ba-ba-ba-ba-ba baleen!`;
+
   // Helper to check if a file is audio
   const isAudioFile = (name: string) => /\.(mp3|wav|ogg)$/i.test(name);
 
@@ -313,202 +340,157 @@ About snakes.`}
           {loading && <div style={{ color: '#4ade80', fontWeight: 'bold', marginTop: 16 }}>Loading tape...</div>}
           {error && <div style={{ color: '#f87171', fontWeight: 'bold', marginTop: 16 }}>{error}</div>}
           <audio ref={audioRef} src={audioUrl || undefined} style={{ display: 'none' }} />
-          {/* Modern Audio Player */}
+          {/* Minimal Retro Audio Player */}
           <div style={{ 
-            width: 450, 
+            width: 280, 
             marginTop: 32, 
             display: 'flex', 
             flexDirection: 'column', 
             alignItems: 'center',
-            background: 'rgba(0, 0, 0, 0.8)',
-            backdropFilter: 'blur(20px)',
-            borderRadius: '24px',
-            padding: '24px 32px',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+            background: '#1a1a1a',
+            border: '2px solid #333',
+            borderRadius: '8px',
+            padding: '16px',
+            boxShadow: 'inset 2px 2px 5px rgba(0,0,0,0.5), inset -2px -2px 5px rgba(255,255,255,0.1)'
           }}>
             {/* Track Title */}
             <div style={{
-              color: '#fff',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              marginBottom: '20px',
+              color: '#00ff00',
+              fontSize: '12px',
+              fontFamily: 'monospace',
+              marginBottom: '12px',
               textAlign: 'center',
-              letterSpacing: '0.5px',
-              textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
+              letterSpacing: '1px',
+              textTransform: 'uppercase'
             }}>
-              Big Big Mammals
+              BIG BIG MAMMALS
             </div>
 
-            {/* Progress Bar Container */}
+            {/* Simple Progress Bar */}
             <div
               style={{
                 width: '100%',
-                height: '8px',
-                background: 'rgba(255, 255, 255, 0.1)',
-                borderRadius: '50px',
-                position: 'relative',
-                marginBottom: '20px',
+                height: '4px',
+                background: '#333',
+                border: '1px inset #666',
+                marginBottom: '16px',
                 cursor: duration > 0 ? 'pointer' : 'default',
-                boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.3)',
-                overflow: 'hidden'
+                position: 'relative'
               }}
               onClick={duration > 0 ? handleSeek : undefined}
             >
-              {/* Progress Fill with Gradient */}
               <div
                 style={{
-                  position: 'absolute',
-                  left: 0,
-                  top: 0,
                   width: duration > 0 ? `${(currentTime / duration) * 100}%` : '0%',
                   height: '100%',
-                  background: 'linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3)',
-                  borderRadius: '50px',
-                  transition: 'width 0.3s ease',
-                  boxShadow: '0 0 20px rgba(255, 107, 107, 0.5)',
+                  background: '#00ff00',
+                  transition: 'width 0.1s linear'
                 }}
               />
-              
-              {/* Animated Progress Glow */}
-              {isPlaying && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: duration > 0 ? `${(currentTime / duration) * 100}%` : '0%',
-                    top: '-2px',
-                    width: '12px',
-                    height: '12px',
-                    background: 'radial-gradient(circle, #fff 0%, #ff6b6b 100%)',
-                    borderRadius: '50%',
-                    transform: 'translateX(-50%)',
-                    boxShadow: '0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 107, 107, 0.6)',
-                    animation: 'pulse 2s infinite',
-                  }}
-                />
-              )}
             </div>
 
-            {/* Controls Row */}
+            {/* Simple Controls */}
             <div style={{
               width: '100%',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between'
+              justifyContent: 'space-between',
+              fontSize: '11px',
+              fontFamily: 'monospace',
+              color: '#999'
             }}>
-              {/* Time Display Left */}
-              <span style={{
-                color: 'rgba(255, 255, 255, 0.8)',
-                fontFamily: digitalFont,
-                fontSize: '14px',
-                letterSpacing: '1px',
-                minWidth: '45px'
-              }}>
-                {formatTime(currentTime)}
-              </span>
-
-              {/* Play/Pause Button */}
+              <span>{formatTime(currentTime)}</span>
+              
               <button
                 onClick={handlePlayPause}
                 style={{
-                  background: isPlaying 
-                    ? 'linear-gradient(145deg, #ff6b6b, #ff5252)' 
-                    : 'linear-gradient(145deg, #48dbfb, #0abde3)',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: '56px',
-                  height: '56px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  background: '#333',
+                  border: '2px outset #666',
+                  width: '40px',
+                  height: '40px',
                   cursor: duration > 0 ? 'pointer' : 'not-allowed',
                   outline: 'none',
-                  transition: 'all 0.3s ease',
-                  boxShadow: isPlaying 
-                    ? '0 8px 25px rgba(255, 107, 107, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)' 
-                    : '0 8px 25px rgba(72, 219, 251, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+                  fontSize: '16px',
+                  color: '#00ff00',
+                  fontFamily: 'monospace',
                   opacity: duration > 0 ? 1 : 0.5,
-                  transform: 'scale(1)',
                 }}
                 disabled={duration === 0}
-                aria-label={isPlaying ? 'Pause' : 'Play'}
                 onMouseDown={(e) => {
-                  e.currentTarget.style.transform = 'scale(0.95)';
+                  if (duration > 0) e.currentTarget.style.border = '2px inset #666';
                 }}
                 onMouseUp={(e) => {
-                  e.currentTarget.style.transform = 'scale(1)';
+                  if (duration > 0) e.currentTarget.style.border = '2px outset #666';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'scale(1)';
+                  if (duration > 0) e.currentTarget.style.border = '2px outset #666';
                 }}
               >
-                {isPlaying ? (
-                  // Pause icon
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <rect x="7" y="5" width="3" height="14" rx="1" fill="#fff"/>
-                    <rect x="14" y="5" width="3" height="14" rx="1" fill="#fff"/>
-                  </svg>
-                ) : (
-                  // Play icon
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ marginLeft: '2px' }}>
-                    <polygon points="8,5 19,12 8,19" fill="#fff"/>
-                  </svg>
-                )}
+                {isPlaying ? '❚❚' : '▶'}
               </button>
 
-              {/* Duration Display Right */}
-              <span style={{
-                color: 'rgba(255, 255, 255, 0.8)',
-                fontFamily: digitalFont,
-                fontSize: '14px',
-                letterSpacing: '1px',
-                minWidth: '45px',
-                textAlign: 'right'
-              }}>
-                {formatTime(duration)}
-              </span>
+              <span>{formatTime(duration)}</span>
             </div>
-
-            {/* Visualizer Bars (decorative) */}
-            {isPlaying && (
-              <div style={{
-                width: '100%',
-                height: '30px',
-                display: 'flex',
-                alignItems: 'end',
-                justifyContent: 'center',
-                gap: '2px',
-                marginTop: '16px',
-                opacity: 0.6
-              }}>
-                {Array.from({ length: 20 }, (_, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      width: '3px',
-                      height: `${Math.random() * 20 + 5}px`,
-                      background: `hsl(${(i * 18) % 360}, 70%, 60%)`,
-                      borderRadius: '2px',
-                      animation: `visualizer 0.${Math.floor(Math.random() * 5) + 5}s ease-in-out infinite alternate`,
-                      animationDelay: `${i * 0.1}s`
-                    }}
-                  />
-                ))}
-              </div>
-            )}
 
             {/* CSS Animations */}
             <style>{`
-              @keyframes pulse {
-                0%, 100% { transform: translateX(-50%) scale(1); opacity: 1; }
-                50% { transform: translateX(-50%) scale(1.2); opacity: 0.8; }
-              }
-              @keyframes visualizer {
-                from { height: 5px; }
-                to { height: ${Math.random() * 25 + 10}px; }
+              @keyframes scrollLyrics {
+                0% { transform: translateX(100vw); }
+                100% { transform: translateX(-100%); }
               }
             `}</style>
           </div>
+
+          {/* Scrolling Lyrics Display */}
+          {isPlaying && audioUrl && (
+            <div style={{
+              position: 'fixed',
+              bottom: '120px',
+              left: '0',
+              width: '100vw',
+              height: '80px',
+              background: 'rgba(0, 0, 0, 0.8)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              borderLeft: 'none',
+              borderRight: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              overflow: 'hidden',
+              zIndex: 1000,
+              boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.5)'
+            }}>
+              <div style={{
+                whiteSpace: 'nowrap',
+                color: '#fff',
+                fontSize: '24px',
+                fontWeight: 'bold',
+                fontFamily: 'Arial, sans-serif',
+                animation: 'scrollLyrics 45s linear infinite',
+                textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)',
+                letterSpacing: '1px',
+                background: 'linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #ff6b6b)',
+                backgroundSize: '400% 100%',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                filter: 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))',
+                animationName: 'scrollLyrics, gradientShift',
+                animationDuration: '45s, 3s',
+                animationTimingFunction: 'linear, ease-in-out',
+                animationIterationCount: 'infinite, infinite'
+              }}>
+                🎵 {bigBigMammalsLyrics.replace(/\n/g, ' • ')} 🎵
+              </div>
+              <style>{`
+                @keyframes gradientShift {
+                  0% { background-position: 0% 50%; }
+                  50% { background-position: 100% 50%; }
+                  100% { background-position: 0% 50%; }
+                }
+              `}</style>
+            </div>
+          )}
         </div>
       </section>
     </div>
