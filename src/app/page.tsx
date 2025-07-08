@@ -323,7 +323,7 @@ About snakes.`}
         </div>
       </section>
 
-      {/* Section 3 - Photographology (clean, no game) */}
+      {/* Section 3 - Photographology with background lyrics */}
       <section style={{
         width: '100vw',
         height: '100vh',
@@ -339,11 +339,45 @@ About snakes.`}
         alignItems: 'center',
         justifyContent: 'center',
       }}>
+        {/* Background lyrics text */}
+        {isPlaying && currentLyric && (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1,
+            pointerEvents: 'none'
+          }}>
+            <div style={{
+              fontSize: '120px',
+              fontWeight: 'bold',
+              color: 'rgba(255, 255, 255, 0.05)',
+              textAlign: 'center',
+              lineHeight: '1.1',
+              fontFamily: 'Arial, sans-serif',
+              letterSpacing: '2px',
+              textShadow: '0 0 20px rgba(255, 255, 255, 0.1)',
+              maxWidth: '90%',
+              wordWrap: 'break-word',
+              transform: 'rotate(-15deg)',
+              userSelect: 'none'
+            }}>
+              {currentLyric}
+            </div>
+          </div>
+        )}
         <div style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           flexDirection: 'column',
+          position: 'relative',
+          zIndex: 10
         }}>
           <div
             style={{
@@ -390,78 +424,6 @@ About snakes.`}
             }
           `}</style>
 
-          {/* Debug info */}
-          <div style={{
-            position: 'fixed',
-            top: '20px',
-            right: '20px',
-            background: 'rgba(0,0,0,0.8)',
-            color: '#00ff00',
-            fontFamily: 'monospace',
-            fontSize: '12px',
-            padding: '10px',
-            borderRadius: '4px',
-            zIndex: 999
-          }}>
-            Playing: {isPlaying ? 'YES' : 'NO'}<br/>
-            Audio URL: {audioUrl ? 'YES' : 'NO'}<br/>
-            Current Lyric: "{currentLyric}"<br/>
-            Lyric Index: {lyricIndex}<br/>
-            Time: {currentTime.toFixed(1)}s
-          </div>
-
-          {/* AI-Synced Lyrics Display */}
-          {isPlaying && audioUrl && currentLyric && (
-            <div style={{
-              position: 'fixed',
-              bottom: '120px',
-              left: '0',
-              width: '100vw',
-              height: '80px',
-              background: 'rgba(0, 0, 0, 0.8)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              borderLeft: 'none',
-              borderRight: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 1000,
-              boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.5)'
-            }}>
-              <div style={{
-                color: '#fff',
-                fontSize: '28px',
-                fontWeight: 'bold',
-                fontFamily: 'Arial, sans-serif',
-                textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)',
-                letterSpacing: '1px',
-                background: 'linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #ff6b6b)',
-                backgroundSize: '400% 100%',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                filter: 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))',
-                animation: 'gradientShift 3s ease-in-out infinite, fadeIn 0.5s ease-in',
-                textAlign: 'center',
-                maxWidth: '90vw',
-                padding: '0 20px'
-              }}>
-                🎵 {currentLyric} 🎵
-              </div>
-              <style>{`
-                @keyframes gradientShift {
-                  0% { background-position: 0% 50%; }
-                  50% { background-position: 100% 50%; }
-                  100% { background-position: 0% 50%; }
-                }
-                @keyframes fadeIn {
-                  0% { opacity: 0; transform: scale(0.9); }
-                  100% { opacity: 1; transform: scale(1); }
-                }
-              `}</style>
-            </div>
-          )}
         </div>
       </section>
     </div>
