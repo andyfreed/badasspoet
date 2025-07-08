@@ -129,15 +129,24 @@ export default function Home() {
   // Simple tape play/stop toggle
   const toggleTape = async () => {
     const audio = audioRef.current;
+    const audio2 = audioRef2.current;
     
-    // If already playing, just stop
+    // If already playing, stop and reset to beginning
     if (isPlaying && audio) {
       audio.pause();
+      audio.currentTime = 0;
       return;
     }
     
-    // If paused but audio loaded, resume
+    // Stop the other tape if it's playing
+    if (isPlaying2 && audio2) {
+      audio2.pause();
+      audio2.currentTime = 0;
+    }
+    
+    // If paused but audio loaded, reset to beginning and play
     if (audio && audioUrl && !isPlaying) {
+      audio.currentTime = 0;
       audio.play();
       return;
     }
@@ -174,18 +183,27 @@ export default function Home() {
 
   // Second tape toggle logic
   const toggleTape2 = async () => {
-    const audio = audioRef2.current;
-    if (!audio) return;
+    const audio = audioRef.current;
+    const audio2 = audioRef2.current;
+    if (!audio2) return;
     
-    // If playing, pause
+    // If playing, stop and reset to beginning
     if (isPlaying2) {
-      audio.pause();
+      audio2.pause();
+      audio2.currentTime = 0;
       return;
     }
     
-    // If paused but audio loaded, resume
-    if (audio && audioUrl2 && !isPlaying2) {
-      audio.play();
+    // Stop the other tape if it's playing
+    if (isPlaying && audio) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+    
+    // If paused but audio loaded, reset to beginning and play
+    if (audio2 && audioUrl2 && !isPlaying2) {
+      audio2.currentTime = 0;
+      audio2.play();
       return;
     }
     
