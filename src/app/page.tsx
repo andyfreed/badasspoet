@@ -20,32 +20,44 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
-  // Lyrics for Big Big Mammals
-  const bigBigMammalsLyrics = `You've got the rhino
-And the ellyphant
-You've got Mr. Hippo
-He's fat and ellygant
-You've got the dugong
-And that manatee
-Mighty gorilla
-And Travis the chimpanzee
-Although the last does not seem so great
-But he ate a lady's face
+  // Timed lyrics for Big Big Mammals (with timestamps in seconds)
+  const timedLyrics = [
+    { time: 0, text: "You've got the rhino" },
+    { time: 3, text: "And the ellyphant" },
+    { time: 6, text: "You've got Mr. Hippo" },
+    { time: 9, text: "He's fat and ellygant" },
+    { time: 12, text: "You've got the dugong" },
+    { time: 15, text: "And that manatee" },
+    { time: 18, text: "Mighty gorilla" },
+    { time: 21, text: "And Travis the chimpanzee" },
+    { time: 24, text: "Although the last does not seem so great" },
+    { time: 27, text: "But he ate a lady's face" },
+    { time: 32, text: "" },
+    { time: 34, text: "Big, Big Mammals" },
+    { time: 37, text: "These are some of my favorite animals" },
+    { time: 41, text: "Big, Big Mammals" },
+    { time: 44, text: "But not the biggest or my favorite animal" },
+    { time: 48, text: "That would be the whale." },
+    { time: 52, text: "" },
+    { time: 54, text: "Big, big Mammals" },
+    { time: 57, text: "Close to my favorite animals" },
+    { time: 61, text: "Big, big mammals" },
+    { time: 64, text: "But not my favorite animals" },
+    { time: 68, text: "That would be the whale" },
+    { time: 71, text: "The big big blue blue whale" },
+    { time: 75, text: "Ba-ba-ba-ba-ba-ba baleen" },
+    { time: 79, text: "Ba-ba-ba-ba-ba-ba baleen!" }
+  ];
 
-Big, Big Mammals
-These are some of my favorite animals
-Big, Big Mammals
-But not the biggest or my favorite animal
-That would be the whale.
-
-Big, big Mammals
-Close to my favorite animals
-Big, big mammals
-But not my favorite animals
-That would be the whale
-The big big blue blue whale
-Ba-ba-ba-ba-ba-ba baleen
-Ba-ba-ba-ba-ba-ba baleen!`;
+  // Get current lyric based on current time
+  const getCurrentLyric = () => {
+    for (let i = timedLyrics.length - 1; i >= 0; i--) {
+      if (currentTime >= timedLyrics[i].time) {
+        return timedLyrics[i].text;
+      }
+    }
+    return "";
+  };
 
   // Helper to check if a file is audio
   const isAudioFile = (name: string) => /\.(mp3|wav|ogg)$/i.test(name);
@@ -441,8 +453,8 @@ About snakes.`}
             `}</style>
           </div>
 
-          {/* Scrolling Lyrics Display */}
-          {isPlaying && audioUrl && (
+          {/* Synced Lyrics Display */}
+          {isPlaying && audioUrl && getCurrentLyric() && (
             <div style={{
               position: 'fixed',
               bottom: '120px',
@@ -456,17 +468,15 @@ About snakes.`}
               borderRight: 'none',
               display: 'flex',
               alignItems: 'center',
-              overflow: 'hidden',
+              justifyContent: 'center',
               zIndex: 1000,
               boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.5)'
             }}>
               <div style={{
-                whiteSpace: 'nowrap',
                 color: '#fff',
-                fontSize: '24px',
+                fontSize: '28px',
                 fontWeight: 'bold',
                 fontFamily: 'Arial, sans-serif',
-                animation: 'scrollLyrics 45s linear infinite',
                 textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)',
                 letterSpacing: '1px',
                 background: 'linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #ff6b6b)',
@@ -475,18 +485,22 @@ About snakes.`}
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
                 filter: 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))',
-                animationName: 'scrollLyrics, gradientShift',
-                animationDuration: '45s, 3s',
-                animationTimingFunction: 'linear, ease-in-out',
-                animationIterationCount: 'infinite, infinite'
+                animation: 'gradientShift 3s ease-in-out infinite, fadeIn 0.5s ease-in',
+                textAlign: 'center',
+                maxWidth: '90vw',
+                padding: '0 20px'
               }}>
-                🎵 {bigBigMammalsLyrics.replace(/\n/g, ' • ')} 🎵
+                🎵 {getCurrentLyric()} 🎵
               </div>
               <style>{`
                 @keyframes gradientShift {
                   0% { background-position: 0% 50%; }
                   50% { background-position: 100% 50%; }
                   100% { background-position: 0% 50%; }
+                }
+                @keyframes fadeIn {
+                  0% { opacity: 0; transform: scale(0.9); }
+                  100% { opacity: 1; transform: scale(1); }
                 }
               `}</style>
             </div>
